@@ -1,10 +1,11 @@
-const config = {
+const config = Object.assign(params, {
     messageTimeout: 30000,
-}
+})
+
 
 const api = ({ base = 'https://api.twitch.tv/helix/', endpoint = '', data, headers = {}, method = 'get' }) => {
     const cliendID = 'kx356i9esjnwv91g7brmxay629ugyl'
-    const authToken = '9fskdcaseqvqpzdwm7y1doxyukxefk'
+    const authToken = config.token
 
     const qs = Object.keys(data).map(k => `${k}=${data[k]}`).join('&')
 
