@@ -20,6 +20,10 @@
     margin-top: 1em;
 }
 
-.badge, .emote {
+.badge, .emotes {
     width: 1em;
+}
+
+.profile {
+    width: 2em;
 }
