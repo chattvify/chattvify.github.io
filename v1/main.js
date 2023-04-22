@@ -163,7 +163,7 @@ function addMessage({ type, channel, state, message = '', timeout = config.messa
     elChat.appendChild(elChatBox)
 
     setTimeout(() => {
-        elChatBox.remove()
+        //elChatBox.remove()
     }, timeout)
 }
 
