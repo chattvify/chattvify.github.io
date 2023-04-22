@@ -9,11 +9,12 @@
     <link href="./style.css" rel="stylesheet">
 
     <script>
+        const token = JSON.parse(atob(location.search.substring(1))) || {}
+
         var twitchID = ''
-        const urlSearchParmas = new URLSearchParams(window.location.search)
         const params = {}
 
-        urlSearchParmas.forEach((v, k) => {
+        token.forEach((v, k) => {
             params[k] = v
         })
 
