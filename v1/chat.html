@@ -9,7 +9,7 @@
     <link href="./style.css" rel="stylesheet">
 
     <script>
-        const token = JSON.parse(atob(location.search.substring(1))) || {}
+        const token = new Map(JSON.parse(atob(location.search.substring(1)))) || new Map()
 
         var twitchID = ''
         const params = {}
