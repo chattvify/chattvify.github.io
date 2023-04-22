@@ -18,7 +18,7 @@
             params[k] = v
         })
 
-        if (urlSearchParmas.has('id') && params.id.length) {
+        if (token.has('id') && params.id.length) {
             twitchID = params.id
         }
         document.title = `Chatify - ${twitchID || 'v1'}`
