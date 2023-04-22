@@ -159,7 +159,12 @@ function addMessage({ type, channel, state, message = '', timeout = config.messa
     elChatBox.appendChild(elUserBox)
     elChatBox.appendChild(elMessage)
 
+
     elChat.appendChild(elChatBox)
+
+    setTimeout(() => {
+        elChat.remove()
+    }, timeout)
 }
 
 function parseMessage({ emoteMap, message }) {
@@ -169,7 +174,7 @@ function parseMessage({ emoteMap, message }) {
         arr.forEach((v) => {
             const start = Number(v.split('-')[0])
             const end = Number(v.split('-')[1]) + 1
-            const img = `<img src="https://static-cdn.jtvnw.net/emoticons/v2/${k}/default/dark/3.0" />`
+            const img = `<img class="emotes emotes-${k}" src="https://static-cdn.jtvnw.net/emoticons/v2/${k}/default/dark/3.0" />`
             rv.push(img)
             msg = msg.substring(end)
         })
