@@ -4,7 +4,7 @@ $(() => {
     console.log(pathname)
     if (pathname.includes('auth')) {
         const clientId = 'kx356i9esjnwv91g7brmxay629ugyl'
-        const uri = encodeURIComponent('http://localhost:4000/access_token')
+        const uri = encodeURIComponent(`${location.origin}/access_token`)
         const searchParams = new URLSearchParams(location.search)
         
         if(!searchParams.has('error')) {
