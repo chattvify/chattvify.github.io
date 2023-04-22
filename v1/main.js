@@ -129,6 +129,7 @@ function addMessage({ type, channel, state, message = '', timeout = config.messa
     elChatBox.classList.add('chat-box')
     elUserBox.classList.add('user')
     elUserImg.classList.add('profile')
+    elUserName.classList.add('user-name')
     elMessage.classList.add('message')
 
     badgeMap.forEach((v, k) => {

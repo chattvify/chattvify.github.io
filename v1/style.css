@@ -1,3 +1,7 @@
+:root{
+    --main-color: #4d7a90;
+}
+
 #chat {
     position: absolute;
     font-weight: 600;
@@ -14,14 +18,17 @@
     position: relative;
     display: flex;
     flex-direction: column;
-    border: 1px solid #000000;
+    border: 1px solid var(--main-color);
     border-radius: 1em;
-    padding: 1em 1.5em;
+    padding: 1em;
     margin-top: 1em;
 }
 
 .user{
     display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: flex-start;
 }
 
 .badge, .emotes {
@@ -30,4 +37,6 @@
 
 .profile {
     width: 2em;
+    border: 3px solid var(--main-color);
+    border-radius: 50%;
 }
