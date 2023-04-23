@@ -44,9 +44,18 @@ const chatFilter = new RegExp(`[${chatFilters.join('')}]`);
 
 let client
 let streamerId
-const isTest = false
+const isTest = config.test || false
 if (isTest) {
-
+    getBadges().then((r) => {
+        cache.badge['global'] = r
+        getUsers({ login: twitchID }).then((user) => {
+            streamerId = user.id
+            getBadges(user.id).then((r) => {
+                cache.badge[twitchID] = r
+                test(user)
+            })
+        })
+    })
 }
 else {
     client = new tmi.client({
@@ -78,10 +87,6 @@ function addListener() {
             streamerId = user.id
             getBadges(user.id).then((r) => {
                 cache.badge[twitchID] = r
-
-                if (params.hasOwnProperty('test')) {
-                    test()
-                }
             })
         })
     })
@@ -211,32 +216,35 @@ function getBadges(channel) {
     })
 }
 
-function test() {
+function test(user) {
+    console.log(user, user.profile_image_url.split('/')[-1])
+    const { display_name, id, login } = user
+
     const state = {
         "badge-info": null,
         "badges": {
             "broadcaster": "1",
             "bits-charity": "1"
         },
-        "client-nonce": "a16f47e7c8c0336da1907ec8aee2d7a1",
-        "color": "#29738F",
-        "display-name": "쿨쿨이",
+        "client-nonce": '',
+        "color": "",
+        "display-name": display_name,
         "emotes": null,
         "first-msg": false,
         "flags": null,
-        "id": "1a4ebf9c-4b69-44fb-8f38-8093ce546fa8",
+        "id": '',
         "mod": false,
         "returning-chatter": false,
-        "room-id": "223491434",
+        "room-id": id,
         "subscriber": false,
-        "tmi-sent-ts": "1681820546923",
+        "tmi-sent-ts": new Date().getTime(),
         "turbo": false,
-        "user-id": "223491434",
+        "user-id": id,
         "user-type": null,
         "emotes-raw": null,
         "badge-info-raw": null,
         "badges-raw": "broadcaster/1,bits-charity/1",
-        "username": "snorlaxh_",
+        "username": login,
         "message-type": "chat"
     }
 

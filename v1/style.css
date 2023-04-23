@@ -1,4 +1,4 @@
-:root{
+:root {
     --main-color: #4d7a90;
 }
 
@@ -14,29 +14,34 @@
     overflow: hidden;
 }
 
-#chat .chat-box{
+#chat .chat-box {
     position: relative;
     display: flex;
     flex-direction: column;
     border: 1px solid var(--main-color);
     border-radius: 1em;
-    padding: 1em;
+    padding: 0.5em 1em;
     margin-top: 1em;
 }
 
-.user{
+#chat .chat-box .user {
     display: flex;
     flex-direction: row;
     align-items: center;
     justify-content: flex-start;
 }
 
-.badge, .emotes {
+.badge,
+.emotes {
     width: 2em;
 }
 
-.profile {
+#chat .chat-box .user .profile {
     width: 2em;
     border: 3px solid var(--main-color);
     border-radius: 50%;
+}e
+
+#chat .chat-box span.message {
+    margin-top: 10px;
 }

@@ -4,3 +4,39 @@ Just customize your theme here.
 ================================================== */
 
 body {}
+
+.btn-user img {
+    width: 50px;
+    height: 50px;
+    border: 3px solid transparent;
+    border-radius: 50%;
+    background-image: linear-gradient(#fff, #fff), linear-gradient(to top right, #b827fc 0%, #2c90fc 25%, #b8fd33 50%, #fec837 75%, #fd1892 100%);
+    background-origin: border-box;
+    background-clip: content-box, border-box;
+}
+
+.require-auth {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    margin: -20px 0;
+    justify-content: center;
+    align-items: center;
+    background: rgba(0, 0, 0, 0.1);
+    backdrop-filter: blur(5px);
+    z-index: 10;
+}
+
+.btn-twitch {
+    background-color: #815fc0;
+}
+
+.chat-sample iframe{
+    width: 100%;
+    height: 500px;
+    background: rgba(0,0,0,0.35);
+    border: none;
+}

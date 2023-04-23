@@ -19,17 +19,6 @@
 
   $(document).ready(function () {
     $('body.hero-anime').removeClass('hero-anime');
-
-    $('#twitchId').change(chatUrl)
-
-    function chatUrl() {
-      const obj = {
-        id: $('#twitchId').val(),
-        token: sessionStorage.getItem('token') || ''
-      }
-    
-      $('#chatURL').val(`${location.origin}/v1/chat.html?${btoa(JSON.stringify(obj))}`)
-    }
   });
 
   //Menu On Hover

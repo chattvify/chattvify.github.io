@@ -7,13 +7,13 @@ topmenu:
 - title: About
   url: "about/"
 
-- title: Auth
+- title: 트위치 로그인
   url: "auth/"
+  class: "ml-2 btn btn-twitch text-white px-3 btn-auth"
 
-- title: "Get this theme"  
-  url: https://bootstrapstarter.com/template-affiliates-bootstrap-jekyll/
-  class: "ml-2 btn btn-dark text-white px-3"
-  external: true
+- title: 
+  url: "#"
+  class: "btn-user"
 
 # Footer Menu
 footermenu:
