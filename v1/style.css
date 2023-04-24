@@ -18,10 +18,11 @@
     position: relative;
     display: flex;
     flex-direction: column;
-    border: 1px solid var(--main-color);
-    border-radius: 1em;
     padding: 0.5em 1em;
     margin-top: 1em;
+    border-left: 0.3em solid ;
+    background-color: white;
+    filter: drop-shadow(5px 5px 3px #1b1a1a);   
 }
 
 #chat .chat-box .user {
@@ -29,18 +30,19 @@
     flex-direction: row;
     align-items: center;
     justify-content: flex-start;
+    gap: 10px;
 }
 
 .badge,
 .emotes {
-    width: 2em;
+    width: 1.5em;
 }
 
 #chat .chat-box .user .profile {
-    width: 2em;
-    border: 3px solid var(--main-color);
+    width: 1.5em;
+    border: 3px solid var(--color);
     border-radius: 50%;
-}e
+}
 
 #chat .chat-box span.message {
     margin-top: 10px;

@@ -17,11 +17,12 @@
         token.forEach((v, k) => {
             params[k] = v
         })
+        sessionStorage.setItem('config', JSON.stringify(params))
 
         if (token.has('id') && params.id.length) {
             twitchID = params.id
         }
-        
+
         document.title = `Chattvify - ${twitchID || 'v1'}`
     </script>
 </head>

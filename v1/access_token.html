@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chattvify</title>
+    <script type="text/javascript">
+        const hash = location.hash.length > 0 ? location.hash.replace('#', '?') : ''
+
+        const hashParams = new URLSearchParams(hash)
+        if (hashParams.has('access_token')) {
+            console.log(hashParams.get('access_token'))
+            const config = JSON.parse(sessionStorage.getItem('config'))
+
+            if (config) {
+                config['token'] = hashParams.get('access_token')
+            }
+            sessionStorage.setItem('config', JSON.stringify(config))
+            location.href = `/v1/chat.html?${btoa(JSON.stringify(config))}`
+        }
+    </script>
+</head>
+
+<body>
+
+</body>
+
+</html>
