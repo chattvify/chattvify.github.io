@@ -177,16 +177,20 @@ https://github.com/iamkun/dayjs/blob/dev/LICENSE
 
     <div class="setting">
         <div>
+            <label for="live">시계 문구</label>
+            <input type="text" name="live">
+        </div>
+        <div>
             <label for="text-color">글자 색상</label>
-            <input type="text" name="text-color">
+            <input type="color" name="text-color">
         </div>
         <div>
             <label for="border-color">선 색상</label>
-            <input type="text" name="border-color">
+            <input type="color" name="border-color">
         </div>
         <div>
             <label for="bg-color">배경 색상</label>
-            <input type="text" name="bg-color">
+            <input type="color" name="bg-color">
             <label for="opacity">투명도</label>
             <input type="number" name="opacity">%
         </div>
@@ -208,19 +212,26 @@ https://github.com/iamkun/dayjs/blob/dev/LICENSE
         const setting = {
             init() {
                 const obj = {
+                    'live': 'TACHIO',
                     'text-color': '#000000',
                     'border-color': '#000000',
                     'bg-color': '#FFFFFF',
                     'opacity': 70
                 }
-                const config = location.hash ? JSON.parse(atob(location.hash.substring(1))) : {}
+                const config = location.search ? JSON.parse(atob(location.search.substring(1))) : {}
                 document.querySelectorAll('input').forEach((el) => {
                     if (el) {
                         const name = el.getAttribute('name')
-                        el.value = config[name] || obj[name]
+                        if (name == 'live') {
+                            el.value = decodeURIComponent(config[name] || obj[name])
+                        }
+                        else {
+                            el.value = config[name] || obj[name]
+                        }
                         console.log(name, config[name], obj[name])
                     }
                 })
+                document.querySelector('#live').innerHTML = decodeURIComponent(config['live'] || obj['live'])
                 document.querySelector('[name=opacity]').value = config['opacity'] || obj['opacity']
 
                 document.body.style.color = config['text-color'] || obj['text-color']
@@ -230,12 +241,13 @@ https://github.com/iamkun/dayjs/blob/dev/LICENSE
             },
             save() {
                 const config = JSON.stringify({
+                    'live': encodeURIComponent(document.querySelector('input[name=live]').value),
                     'text-color': document.querySelector('input[name=text-color]').value,
                     'border-color': document.querySelector('input[name=border-color]').value,
                     'bg-color': document.querySelector('input[name=bg-color]').value,
                     'opacity': document.querySelector('input[name=opacity]').value,
                 })
-                location.hash = `#${btoa(config)}`
+                location.search = `?${btoa(config)}`
                 this.init()
                 this.toggle()
             },
