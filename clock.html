@@ -28,7 +28,6 @@ https://github.com/iamkun/dayjs/blob/dev/LICENSE
 
         body {
             text-align: center;
-            font-family: 'Roboto', sans-serif;
             /* ▼ 텍스트 색상 변경 ▼ */
             /* color: #ffd800; */
             /* ▲ 텍스트 색상 변경 ▲ */
@@ -39,7 +38,6 @@ https://github.com/iamkun/dayjs/blob/dev/LICENSE
             top: 0;
             left: 50%;
             transform: translate(-50%, 0);
-            width: 180px;
             padding: 12px 10px 5px 10px;
             border-radius: 0px 0px 10px 10px;
             /* ▼ 배경 색상 변경(red, green, blue, alpha) ▼ */
@@ -53,7 +51,13 @@ https://github.com/iamkun/dayjs/blob/dev/LICENSE
             padding-bottom: 2px;
         }
 
+        .live{
+            display: flex;
+            justify-content: center;
+        }
+
         #live {
+            width: max-content;
             border: solid 2px;
             /* 외곽선 둥글기 */
             border-radius: 5px;
@@ -140,6 +144,10 @@ https://github.com/iamkun/dayjs/blob/dev/LICENSE
             padding: 5px;
             width: 50px;
         }
+
+        .setting textarea {
+            resize: none;
+        }
     </style>
 </head>
 
@@ -195,6 +203,11 @@ https://github.com/iamkun/dayjs/blob/dev/LICENSE
             <input type="number" name="opacity">%
         </div>
 
+        <div>
+            <label for="webfont">웹 폰트</label>
+            <textarea name="webfont" rows="10" class="webfont"></textarea>
+        </div>
+
         <button type="button" class="btn btn-save">저장</button>
     </div>
 
@@ -216,9 +229,30 @@ https://github.com/iamkun/dayjs/blob/dev/LICENSE
                     'text-color': '#000000',
                     'border-color': '#000000',
                     'bg-color': '#FFFFFF',
-                    'opacity': 70
+                    'opacity': 70,
+                    'webfont': '',
                 }
-                const config = location.search ? JSON.parse(atob(location.search.substring(1))) : {}
+                const config = {}
+                if (location.search) {
+                    Object.assign(config, JSON.parse(atob(location.search.substring(1))))
+                }
+                if (localStorage.getItem('clock-config')) {
+                    Object.assign(config, JSON.parse(localStorage.getItem('clock-config')))
+                }
+
+                const font = (config['webfont'] || obj['webfont']).replace('@font-face ', '').replace('{', '').replace('}', '').replaceAll('\n', '').trim()
+                const fontObj = {}
+                font.split(';').forEach((r) => {
+                    const item = r.split(':')
+                    if (r) {
+                        const k = item[0].toString().trim()
+                        const v = item[1].toString().trim().replaceAll("'", "").replaceAll('"', '')
+                        if (k != 'src') {
+                            fontObj[k] = v
+                        }
+                    }
+                })
+
                 document.querySelectorAll('input').forEach((el) => {
                     if (el) {
                         const name = el.getAttribute('name')
@@ -238,6 +272,15 @@ https://github.com/iamkun/dayjs/blob/dev/LICENSE
                 document.querySelector('#time').style.borderColor = config['border-color'] || obj['border-color']
 
                 document.querySelector('.nowtime').style.backgroundColor = hexToRGB(config['bg-color'] || obj['bg-color'], (config['opacity'] || obj['opacity']) / 100)
+
+                console.log(fontObj)
+                const elStyle = document.createElement('style')
+                elStyle.innerHTML = `
+${(config['webfont'] || obj['webfont'])}
+body { 
+    font-family: '${fontObj['font-family']}', 'Roboto', sans-serif;
+}`
+                document.querySelector('head').appendChild(elStyle)
             },
             save() {
                 const config = JSON.stringify({
@@ -246,8 +289,9 @@ https://github.com/iamkun/dayjs/blob/dev/LICENSE
                     'border-color': document.querySelector('input[name=border-color]').value,
                     'bg-color': document.querySelector('input[name=bg-color]').value,
                     'opacity': document.querySelector('input[name=opacity]').value,
+                    'webfont': document.querySelector('textarea.webfont').value.replaceAll('\n', '').trim()
                 })
-                location.search = `?${btoa(config)}`
+                localStorage.setItem('clock-config', config)
                 this.init()
                 this.toggle()
             },
