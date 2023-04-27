@@ -291,9 +291,9 @@ https://github.com/iamkun/dayjs/blob/dev/LICENSE
                         "Access-Control-Allow-Origin": "*"
                     }
                 }).then((res) => {
+                    console.log(res)
                     console.log(res.json())
                 })
-                console.log(config)
 
                 arr.forEach((name) => {
                     if (!this.picker.hasOwnProperty(name)) {
