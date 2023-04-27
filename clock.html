@@ -106,6 +106,10 @@ https://github.com/iamkun/dayjs/blob/dev/LICENSE
             z-index: 11;
         }
 
+        .setting-icon.showing svg {
+            fill: white !important;
+        }
+
         .setting {
             position: absolute;
             display: none;
@@ -123,6 +127,10 @@ https://github.com/iamkun/dayjs/blob/dev/LICENSE
             box-sizing: border-box;
         }
 
+        .setting.showing {
+            display: flex;
+        }
+
         .setting div {
             display: flex;
             justify-content: space-between;
@@ -130,9 +138,23 @@ https://github.com/iamkun/dayjs/blob/dev/LICENSE
             gap: 1em;
         }
 
+        .setting div.overlay {
+            gap: 0;
+        }
+
+        .setting div.overlay input[type="text"] {
+            border: 2px solid #000;
+            width: max-content;
+            margin-left: 1em;
+            margin-right: -1px;
+            height: 100%;
+            box-sizing: border-box;
+        }
+
         .setting .btn {
             border: 2px solid #000;
-            border-radius: 5px;
+            height: 100%;
+            border-radius: 0 5px 5px 0;
             padding: 5px 10px;
             background: white;
             transition: .5s;
@@ -212,7 +234,11 @@ https://github.com/iamkun/dayjs/blob/dev/LICENSE
             <textarea name="webfont" rows="10" class="webfont"></textarea>
         </div>
 
-        <button type="button" class="btn btn-save">저장</button>
+        <div class="overlay">
+            <label for="clock-url">오버레이 주소</label>
+            <input type="text" name="clock-url" value="">
+            <button type="button" class="btn btn-save">URL 생성</button>
+        </div>
     </div>
 
     <script type="text/javascript">
@@ -228,7 +254,10 @@ https://github.com/iamkun/dayjs/blob/dev/LICENSE
 
         const setting = {
             picker: {},
+            uuid: '',
             init() {
+                setting.uuid = location.search ? location.search.substring(1) : crypto.randomUUID()
+
                 const arr = ['text-color', 'border-color', 'bg-color']
 
                 const obj = {
@@ -238,6 +267,7 @@ https://github.com/iamkun/dayjs/blob/dev/LICENSE
                     'bg-color': 'rgba(255, 255, 255, 0.7)',
                     'opacity': 70,
                     'webfont': '',
+                    'url': '',
                 }
 
                 const config = {}
@@ -317,9 +347,6 @@ https://github.com/iamkun/dayjs/blob/dev/LICENSE
                     }
                 })
 
-                if (location.search) {
-                    Object.assign(config, JSON.parse(atob(location.search.substring(1))))
-                }
                 if (localStorage.getItem('clock-config')) {
                     Object.assign(config, JSON.parse(localStorage.getItem('clock-config')))
                 }
@@ -343,8 +370,11 @@ https://github.com/iamkun/dayjs/blob/dev/LICENSE
                         if (name == 'live') {
                             el.value = decodeURIComponent(config[name] || obj[name])
                         }
-                        else {
+                        else if (name != 'clock-url') {
                             el.value = config[name] || obj[name]
+                        }
+                        else {
+                            el.value = `${location.origin}${location.pathname}?${setting.uuid}`
                         }
                     }
                 })
@@ -383,14 +413,18 @@ body {
                     }
                 }).then(() => {
                     this.init()
-                    this.toggle()
+                    const url = `${location.origin}${location.pathname}?${setting.uuid}`
+                    document.querySelector('[name=overlay-url]').value = url
+                    location.replace(url)
+                    //this.toggle()
                 })
             },
             toggle() {
                 const el = document.querySelector('.setting')
                 var style = window.getComputedStyle ? getComputedStyle(el, null) : el.currentStyle;
 
-                el.style.display = style['display'] == 'none' ? 'flex' : 'none'
+                el.classList.toggle('showing')
+                document.querySelector('.setting-icon').classList.toggle('showing')
             }
         }
 
