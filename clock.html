@@ -154,7 +154,7 @@ https://github.com/iamkun/dayjs/blob/dev/LICENSE
         .setting .btn {
             border: 2px solid #000;
             height: 100%;
-            border-radius: 0 5px 5px 0;
+            border-radius: 5px;
             padding: 5px 10px;
             background: white;
             transition: .5s;
@@ -164,6 +164,16 @@ https://github.com/iamkun/dayjs/blob/dev/LICENSE
         .setting .btn:hover {
             background: black;
             color: white;
+        }
+
+        .setting .btn.btn-copy{
+            border-radius: 0 5px 5px 0;
+            border-color: #188038;
+        }
+
+        .setting .btn.btn-copy:hover{
+            border-radius: 0 5px 5px 0;
+            background: #188038;
         }
 
         .setting input[type=number] {
@@ -237,8 +247,10 @@ https://github.com/iamkun/dayjs/blob/dev/LICENSE
         <div class="overlay">
             <label for="clock-url">오버레이 주소</label>
             <input type="text" name="clock-url" value="">
-            <button type="button" class="btn btn-save">URL 생성</button>
+            <button type="button" class="btn btn-copy">복사</button>
         </div>
+
+        <button type="button" class="btn btn-save">저장</button>
     </div>
 
     <script type="text/javascript">
