@@ -255,7 +255,7 @@ https://github.com/iamkun/dayjs/blob/dev/LICENSE
         const setting = {
             picker: {},
             uuid: '',
-            init() {
+            async init() {
                 setting.uuid = location.search ? location.search.substring(1) : crypto.randomUUID()
 
                 const arr = ['text-color', 'border-color', 'bg-color']
@@ -270,7 +270,17 @@ https://github.com/iamkun/dayjs/blob/dev/LICENSE
                     'url': '',
                 }
 
-                const config = {}
+                const config = await fetch(`https://loa-on.snorlaxh.workers.dev/clock/${setting.uuid}`, {
+                    method: 'GET',
+                    headers: {
+                        "Access-Control-Allow-Headers": "*",
+                        "Access-Control-Allow-Methods": "POST",
+                        "Access-Control-Allow-Origin": "*"
+                    }
+                }).then((res) => {
+                    return res.json()
+                })
+                console.log(config)
 
                 arr.forEach((name) => {
                     if (!this.picker.hasOwnProperty(name)) {
