@@ -153,7 +153,6 @@ https://github.com/iamkun/dayjs/blob/dev/LICENSE
 
         .setting .btn {
             border: 2px solid #000;
-            height: 100%;
             border-radius: 5px;
             padding: 5px 10px;
             background: white;
@@ -266,10 +265,8 @@ https://github.com/iamkun/dayjs/blob/dev/LICENSE
 
         const setting = {
             picker: {},
-            uuid: '',
+            uuid: location.search ? location.search.substring(1) : crypto.randomUUID(),
             async init() {
-                setting.uuid = location.search ? location.search.substring(1) : crypto.randomUUID()
-
                 const arr = ['text-color', 'border-color', 'bg-color']
 
                 const obj = {
@@ -282,8 +279,7 @@ https://github.com/iamkun/dayjs/blob/dev/LICENSE
                     'url': '',
                 }
 
-                const config = {}
-                await fetch(`https://loa-on.snorlaxh.workers.dev/clock/${setting.uuid}`, {
+                const config = await fetch(`https://loa-on.snorlaxh.workers.dev/clock/${setting.uuid}`, {
                     method: 'GET',
                     headers: {
                         "Access-Control-Allow-Headers": "*",
@@ -291,8 +287,7 @@ https://github.com/iamkun/dayjs/blob/dev/LICENSE
                         "Access-Control-Allow-Origin": "*"
                     }
                 }).then((res) => {
-                    console.log(res)
-                    console.log(res.json())
+                    return res.json() || {}
                 })
 
                 arr.forEach((name) => {
@@ -434,7 +429,7 @@ body {
                     this.init()
                     const url = `${location.origin}${location.pathname}?${setting.uuid}`
                     document.querySelector('[name=clock-url]').value = url
-                    //location.replace(url)
+                    location.replace(url)
                     //this.toggle()
                 })
             },
