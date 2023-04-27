@@ -166,12 +166,12 @@ https://github.com/iamkun/dayjs/blob/dev/LICENSE
             color: white;
         }
 
-        .setting .btn.btn-copy{
+        .setting .btn.btn-copy {
             border-radius: 0 5px 5px 0;
             border-color: #188038;
         }
 
-        .setting .btn.btn-copy:hover{
+        .setting .btn.btn-copy:hover {
             border-radius: 0 5px 5px 0;
             background: #188038;
         }
@@ -368,7 +368,7 @@ https://github.com/iamkun/dayjs/blob/dev/LICENSE
                         })
                     }
                 })
-                
+
 
                 const font = (config['webfont'] || obj['webfont']).replace('@font-face ', '').replace('{', '').replace('}', '').replaceAll('\n', '').trim()
                 const fontObj = {}
@@ -456,6 +456,16 @@ body {
 
         document.querySelector('.btn-save').onclick = (e) => {
             setting.save()
+        }
+
+        document.querySelector('.btn-copy').onclick = (e) => {
+            navigator.clipboard.writeText(document.querySelector('[name=clock-url]').value).then(() => {
+                console.log('Content copied to clipboard');
+                /* Resolved - 클립보드에 복사 성공 */
+            }, () => {
+                console.error('Failed to copy');
+                /* Rejected - 클립보드에 복사 실패 */
+            });
         }
 
         function hexToRGB(hex, alpha) {
