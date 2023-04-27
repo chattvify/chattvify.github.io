@@ -376,6 +376,11 @@ body {
                 fetch('https://loa-on.snorlaxh.workers.dev/clock', {
                     method: 'POST',
                     body: config,
+                    headers: {
+                        "Access-Control-Allow-Headers": "*",
+                        "Access-Control-Allow-Methods": "POST",
+                        "Access-Control-Allow-Origin": "*"
+                    }
                 }).then(() => {
                     this.init()
                     this.toggle()
