@@ -399,12 +399,9 @@ body {
                     'bg-color': this.picker['bg-color'].getColor().toRGBA().toString(),
                     'webfont': document.querySelector('textarea.webfont').value.replaceAll('\n', '').trim()
                 }
-                const data = {}
-                data[setting.uuid] = config
-                console.log(JSON.stringify(data))
-                fetch('https://loa-on.snorlaxh.workers.dev/clock', {
+                fetch(`https://loa-on.snorlaxh.workers.dev/clock/${setting.uuid}`, {
                     method: 'POST',
-                    body: JSON.stringify(data),
+                    body: JSON.stringify(config),
                     headers: {
                         "Access-Control-Allow-Headers": "*",
                         "Access-Control-Allow-Methods": "POST",
