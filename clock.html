@@ -54,7 +54,7 @@ https://github.com/iamkun/dayjs/blob/dev/LICENSE
             padding-bottom: 2px;
         }
 
-        .live{
+        .live {
             display: flex;
             justify-content: center;
         }
@@ -227,22 +227,116 @@ https://github.com/iamkun/dayjs/blob/dev/LICENSE
         setInterval(day, 1000);
 
         const setting = {
+            picker: {},
             init() {
+                const arr = ['text-color', 'border-color', 'bg-color']
+
                 const obj = {
                     'live': 'TACHIO',
                     'text-color': '#000000',
                     'border-color': '#000000',
-                    'bg-color': '#FFFFFF',
+                    'bg-color': 'rgba(255, 255, 255, 0.7)',
                     'opacity': 70,
                     'webfont': '',
                 }
+
                 const config = {}
+
+                arr.forEach((name) => {
+                    if (!this.picker.hasOwnProperty(name)) {
+                        this.picker[name] = Pickr.create({
+                            el: document.querySelector(`[name=${name}]`),
+                            container: 'body',
+                            theme: 'nano',
+                            default: config[name] || obj[name],
+                            swatches: [
+                                'rgba(244, 67, 54, 1)',
+                                'rgba(233, 30, 99, 0.95)',
+                                'rgba(156, 39, 176, 0.9)',
+                                'rgba(103, 58, 183, 0.85)',
+                                'rgba(63, 81, 181, 0.8)',
+                                'rgba(33, 150, 243, 0.75)',
+                                'rgba(3, 169, 244, 0.7)',
+                                'rgba(0, 188, 212, 0.7)',
+                                'rgba(0, 150, 136, 0.75)',
+                                'rgba(76, 175, 80, 0.8)',
+                                'rgba(139, 195, 74, 0.85)',
+                                'rgba(205, 220, 57, 0.9)',
+                                'rgba(255, 235, 59, 0.95)',
+                                'rgba(255, 193, 7, 1)'
+                            ],
+                            components: {
+                                palette: true,
+                                preview: true,
+                                opacity: true,
+                                hue: true,
+                                interaction: {
+                                    input: true,
+                                    cancel: true,
+                                    save: true
+                                }
+                            },
+                            interaction: {
+                                rgba: true
+                            },
+                            i18n: {
+                                // Strings visible in the UI
+                                'ui:dialog': 'color picker dialog',
+                                'btn:toggle': 'toggle color picker dialog',
+                                'btn:swatch': 'color swatch',
+                                'btn:last-color': 'use previous color',
+                                'btn:save': 'Save',
+                                'btn:cancel': 'Cancel',
+                                'btn:clear': 'Clear',
+
+                                // Strings used for aria-labels
+                                'aria:btn:save': 'save and close',
+                                'aria:btn:cancel': 'cancel and close',
+                                'aria:btn:clear': 'clear and close',
+                                'aria:input': 'color input field',
+                                'aria:palette': 'color selection area',
+                                'aria:hue': 'hue selection slider',
+                                'aria:opacity': 'selection slider'
+                            }
+                        }).on('init', (color, instance) => {
+                            if (name == 'bg-color') {
+                                document.querySelector('[name=opacity]').value = (color.getColor().toRGBA()[3] || 1) * 100
+                            }
+                            document.querySelectorAll('.pcr-save').forEach((el) => { el.value = 'Save' })
+                            document.querySelectorAll('.pcr-cancel').forEach((el) => { el.value = 'Cancel' })
+                        }).on('save', (color, instance) => {
+                            if (color) {
+                                this.picker[name].hide()
+                                if (name == 'bg-color') {
+                                    document.querySelector('[name=opacity]').value = (color.getColor().toRGBA()[3] || 1) * 100
+                                }
+                            }
+                        }).on('cancel', instance => {
+                            this.picker[name].hide()
+                        })
+                    }
+                })
+
                 if (location.search) {
                     Object.assign(config, JSON.parse(atob(location.search.substring(1))))
                 }
                 if (localStorage.getItem('clock-config')) {
                     Object.assign(config, JSON.parse(localStorage.getItem('clock-config')))
                 }
+
+                const font = (config['webfont'] || obj['webfont']).replace('@font-face ', '').replace('{', '').replace('}', '').replaceAll('\n', '').trim()
+                const fontObj = {}
+                font.split(';').forEach((r) => {
+                    const item = r.split(':')
+                    if (r) {
+                        const k = item[0].toString().trim()
+                        const v = item[1].toString().trim().replaceAll("'", "").replaceAll('"', '')
+                        if (k != 'src') {
+                            fontObj[k] = v
+                        }
+                    }
+                })
+
                 document.querySelectorAll('input').forEach((el) => {
                     if (el) {
                         const name = el.getAttribute('name')
@@ -252,64 +346,16 @@ https://github.com/iamkun/dayjs/blob/dev/LICENSE
                         else {
                             el.value = config[name] || obj[name]
                         }
-                        if (name.includes('color')) {
-                            picker[name] = Pickr.create({
-                                el,
-                                theme: 'nano',
-                                default: config[name] || obj[name],
-                                swatches: [
-                                    'rgba(244, 67, 54, 1)',
-                                    'rgba(233, 30, 99, 0.95)',
-                                    'rgba(156, 39, 176, 0.9)',
-                                    'rgba(103, 58, 183, 0.85)',
-                                    'rgba(63, 81, 181, 0.8)',
-                                    'rgba(33, 150, 243, 0.75)',
-                                    'rgba(3, 169, 244, 0.7)',
-                                    'rgba(0, 188, 212, 0.7)',
-                                    'rgba(0, 150, 136, 0.75)',
-                                    'rgba(76, 175, 80, 0.8)',
-                                    'rgba(139, 195, 74, 0.85)',
-                                    'rgba(205, 220, 57, 0.9)',
-                                    'rgba(255, 235, 59, 0.95)',
-                                    'rgba(255, 193, 7, 1)'
-                                ],
-                                components: {
-                                    palette: true,
-                                    preview: true,
-                                    opacity: true,
-                                    hue: true,
-                                    interaction: {
-                                        input: true,
-                                        cancel: true,
-                                        save: true
-                                    }
-                                },
-                                interaction: {
-                                    rgba: true
-                                }
-                            })
-                            picker[name].on('show', (color, instance) => {
-
-                            }).on('save', (color, instance) => {
-                                if (color) {
-                                    instance.options.el.vlaue = color.toRGBA()
-                                    picker[name].hide()
-                                }
-                            }).on('cancel', instance => {
-                                picker[name].hide()
-                            })
-                        }
                     }
                 })
+                document.querySelector('[name=webfont]').value = config['webfont'] || obj['webfont']
                 document.querySelector('#live').innerHTML = decodeURIComponent(config['live'] || obj['live'])
-                document.querySelector('[name=opacity]').value = config['opacity'] || obj['opacity']
 
                 document.body.style.color = config['text-color'] || obj['text-color']
                 document.querySelector('#time').style.borderColor = config['border-color'] || obj['border-color']
 
                 document.querySelector('.nowtime').style.backgroundColor = hexToRGB(config['bg-color'] || obj['bg-color'], (config['opacity'] || obj['opacity']) / 100)
 
-                console.log(fontObj)
                 const elStyle = document.createElement('style')
                 elStyle.innerHTML = `
 ${(config['webfont'] || obj['webfont'])}
@@ -321,15 +367,19 @@ body {
             save() {
                 const config = JSON.stringify({
                     'live': encodeURIComponent(document.querySelector('input[name=live]').value),
-                    'text-color': document.querySelector('input[name=text-color]').value,
-                    'border-color': document.querySelector('input[name=border-color]').value,
-                    'bg-color': document.querySelector('input[name=bg-color]').value,
-                    'opacity': document.querySelector('input[name=opacity]').value,
+                    'text-color': this.picker['text-color'].getColor().toRGBA().toString(),
+                    'border-color': this.picker['border-color'].getColor().toRGBA().toString(),
+                    'bg-color': this.picker['bg-color'].getColor().toRGBA().toString(),
                     'webfont': document.querySelector('textarea.webfont').value.replaceAll('\n', '').trim()
                 })
-                localStorage.setItem('clock-config', config)
-                this.init()
-                this.toggle()
+                console.log(config)
+                fetch('https://loa-on.snorlaxh.workers.dev/clock', {
+                    method: 'POST',
+                    body: config,
+                }).then(() => {
+                    this.init()
+                    this.toggle()
+                })
             },
             toggle() {
                 const el = document.querySelector('.setting')
