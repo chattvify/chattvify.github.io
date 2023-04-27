@@ -399,7 +399,7 @@ https://github.com/iamkun/dayjs/blob/dev/LICENSE
                 document.body.style.color = config['text-color'] || obj['text-color']
                 document.querySelector('#time').style.borderColor = config['border-color'] || obj['border-color']
 
-                document.querySelector('.nowtime').style.backgroundColor = hexToRGB(config['bg-color'] || obj['bg-color'], (config['opacity'] || obj['opacity']) / 100)
+                document.querySelector('.nowtime').style.backgroundColor = config['bg-color'] || obj['bg-color']
 
                 const elStyle = document.createElement('style')
                 elStyle.innerHTML = `
