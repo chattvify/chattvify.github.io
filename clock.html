@@ -346,10 +346,7 @@ https://github.com/iamkun/dayjs/blob/dev/LICENSE
                         })
                     }
                 })
-
-                if (localStorage.getItem('clock-config')) {
-                    Object.assign(config, JSON.parse(localStorage.getItem('clock-config')))
-                }
+                
 
                 const font = (config['webfont'] || obj['webfont']).replace('@font-face ', '').replace('{', '').replace('}', '').replaceAll('\n', '').trim()
                 const fontObj = {}
@@ -395,17 +392,18 @@ body {
                 document.querySelector('head').appendChild(elStyle)
             },
             save() {
-                const config = JSON.stringify({
+                const config = {
                     'live': encodeURIComponent(document.querySelector('input[name=live]').value),
                     'text-color': this.picker['text-color'].getColor().toRGBA().toString(),
                     'border-color': this.picker['border-color'].getColor().toRGBA().toString(),
                     'bg-color': this.picker['bg-color'].getColor().toRGBA().toString(),
                     'webfont': document.querySelector('textarea.webfont').value.replaceAll('\n', '').trim()
-                })
-                console.log(config)
+                }
+                const data = {}
+                data[setting.uuid] = config
                 fetch('https://loa-on.snorlaxh.workers.dev/clock', {
                     method: 'POST',
-                    body: config,
+                    body: JSON.stringify(data),
                     headers: {
                         "Access-Control-Allow-Headers": "*",
                         "Access-Control-Allow-Methods": "POST",
@@ -414,7 +412,7 @@ body {
                 }).then(() => {
                     this.init()
                     const url = `${location.origin}${location.pathname}?${setting.uuid}`
-                    document.querySelector('[name=overlay-url]').value = url
+                    document.querySelector('[name=clock-url]').value = url
                     location.replace(url)
                     //this.toggle()
                 })
