@@ -282,7 +282,8 @@ https://github.com/iamkun/dayjs/blob/dev/LICENSE
                     'url': '',
                 }
 
-                const config = await fetch(`https://loa-on.snorlaxh.workers.dev/clock/${setting.uuid}`, {
+                const config = {}
+                await fetch(`https://loa-on.snorlaxh.workers.dev/clock/${setting.uuid}`, {
                     method: 'GET',
                     headers: {
                         "Access-Control-Allow-Headers": "*",
@@ -290,7 +291,7 @@ https://github.com/iamkun/dayjs/blob/dev/LICENSE
                         "Access-Control-Allow-Origin": "*"
                     }
                 }).then((res) => {
-                    return res.json()
+                    console.log(res.json())
                 })
                 console.log(config)
 
