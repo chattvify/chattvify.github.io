@@ -463,7 +463,7 @@ https://github.com/iamkun/dayjs/blob/dev/LICENSE
                             if (color) {
                                 this.picker[name].hide()
                                 if (name == 'bg-color') {
-                                    document.querySelector('[name=opacity]').value = (color.getColor().toRGBA()[3] || 1) * 100
+                                    document.querySelector('[name=opacity]').value = (color.toRGBA()[3] || 1) * 100
                                 }
                             }
                         }).on('cancel', instance => {
@@ -561,6 +561,16 @@ body {
                 snackbar.show('클립보드에 복사 실패')
                 /* Rejected - 클립보드에 복사 실패 */
             });
+        }
+
+        document.querySelector('input[name=opacity]').onchange = (e) => {
+            const { value } = e.target
+            const color = setting.picker['bg-color'].getColor().toRGBA()
+            const alpha = Number(value) || 0
+            
+            color[3] = alpha / 100
+
+            setting.picker['bg-color'].setColor(`rgba(${color.map((v) => v)})`)
         }
     </script>
 </body>
