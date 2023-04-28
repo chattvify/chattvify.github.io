@@ -252,6 +252,12 @@ https://github.com/iamkun/dayjs/blob/dev/LICENSE
         <button type="button" class="btn btn-save">저장</button>
     </div>
 
+    
+<!-- <button class="btn" style="position: absolute; bottom: 0;">스낵바 테스트</button>
+
+<div class="snackbar">
+
+</div> -->
 
     <script type="text/javascript">
         const day = function () {
@@ -372,6 +378,11 @@ https://github.com/iamkun/dayjs/blob/dev/LICENSE
                 })
             },
             loadConfig() {
+                document.querySelector('input[name=live]').value = decodeURIComponent(setting.config[name])
+                document.querySelector('input[name=clock-url]').value = `${location.origin}${location.pathname}?${setting.uuid}`
+                document.querySelector('[name=webfont]').value = setting.config['webfont']
+            },
+            render() {
                 const font = (setting.config['webfont']).replace('@font-face ', '').replace('{', '').replace('}', '').replaceAll('\n', '').trim()
                 const fontObj = {}
                 font.split(';').forEach((r) => {
@@ -385,11 +396,6 @@ https://github.com/iamkun/dayjs/blob/dev/LICENSE
                     }
                 })
 
-                document.querySelector('input[name=live]').value = decodeURIComponent(setting.config[name])
-                document.querySelector('input[name=clock-url]').value = `${location.origin}${location.pathname}?${setting.uuid}`
-                document.querySelector('[name=webfont]').value = setting.config['webfont']
-            },
-            render() {
                 document.querySelector('#live').innerHTML = decodeURIComponent(setting.config['live'])
 
                 document.body.style.color = setting.config['text-color']
