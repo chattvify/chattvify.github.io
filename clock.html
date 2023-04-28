@@ -267,19 +267,14 @@ https://github.com/iamkun/dayjs/blob/dev/LICENSE
             picker: {},
             uuid: location.search ? location.search.substring(1) : crypto.randomUUID(),
             async init() {
-                const arr = ['text-color', 'border-color', 'bg-color']
+                const config = await getConfig()
 
-                const obj = {
-                    'live': 'TACHIO',
-                    'text-color': '#000000',
-                    'border-color': '#000000',
-                    'bg-color': 'rgba(255, 255, 255, 0.7)',
-                    'opacity': 70,
-                    'webfont': '',
-                    'url': '',
-                }
-
-                const config = await fetch(`https://loa-on.snorlaxh.workers.dev/clock/${setting.uuid}`, {
+                this.initPicker()
+                this.loadConfig()
+                this.render()
+            },
+            getConfig() {
+                return fetch(`https://loa-on.snorlaxh.workers.dev/clock/${setting.uuid}`, {
                     method: 'GET',
                     headers: {
                         "Access-Control-Allow-Headers": "*",
@@ -287,16 +282,25 @@ https://github.com/iamkun/dayjs/blob/dev/LICENSE
                         "Access-Control-Allow-Origin": "*"
                     }
                 }).then((res) => {
-                    return res.json() || {}
+                    return res.json() || {
+                        'live': 'TACHIO',
+                        'text-color': '#000000',
+                        'border-color': '#000000',
+                        'bg-color': 'rgba(255, 255, 255, 0.7)',
+                        'opacity': 70,
+                        'webfont': '',
+                        'url': '',
+                    }
                 })
-
-                arr.forEach((name) => {
+            },
+            initPicker() {
+                ['text-color', 'border-color', 'bg-color'].forEach((name) => {
                     if (!this.picker.hasOwnProperty(name)) {
                         this.picker[name] = Pickr.create({
                             el: document.querySelector(`[name=${name}]`),
                             container: 'body',
                             theme: 'nano',
-                            default: config[name] || obj[name],
+                            default: config[name],
                             swatches: [
                                 'rgba(244, 67, 54, 1)',
                                 'rgba(233, 30, 99, 0.95)',
@@ -364,9 +368,9 @@ https://github.com/iamkun/dayjs/blob/dev/LICENSE
                         })
                     }
                 })
-
-
-                const font = (config['webfont'] || obj['webfont']).replace('@font-face ', '').replace('{', '').replace('}', '').replaceAll('\n', '').trim()
+            },
+            loadConfig() {
+                const font = (config['webfont']).replace('@font-face ', '').replace('{', '').replace('}', '').replaceAll('\n', '').trim()
                 const fontObj = {}
                 font.split(';').forEach((r) => {
                     const item = r.split(':')
@@ -379,27 +383,17 @@ https://github.com/iamkun/dayjs/blob/dev/LICENSE
                     }
                 })
 
-                document.querySelectorAll('input').forEach((el) => {
-                    if (el) {
-                        const name = el.getAttribute('name')
-                        if (name == 'live') {
-                            el.value = decodeURIComponent(config[name] || obj[name])
-                        }
-                        else if (name != 'clock-url') {
-                            el.value = config[name] || obj[name]
-                        }
-                        else {
-                            el.value = `${location.origin}${location.pathname}?${setting.uuid}`
-                        }
-                    }
-                })
-                document.querySelector('[name=webfont]').value = config['webfont'] || obj['webfont']
-                document.querySelector('#live').innerHTML = decodeURIComponent(config['live'] || obj['live'])
+                document.querySelector('input[name=live]').value = decodeURIComponent(config[name])
+                document.querySelector('input[name=clock-url]').value = `${location.origin}${location.pathname}?${setting.uuid}`
+                document.querySelector('[name=webfont]').value = config['webfont']
+            },
+            render() {
+                document.querySelector('#live').innerHTML = decodeURIComponent(config['live'])
 
-                document.body.style.color = config['text-color'] || obj['text-color']
-                document.querySelector('#time').style.borderColor = config['border-color'] || obj['border-color']
+                document.body.style.color = config['text-color']
+                document.querySelector('#time').style.borderColor = config['border-color']
 
-                document.querySelector('.nowtime').style.backgroundColor = config['bg-color'] || obj['bg-color']
+                document.querySelector('.nowtime').style.backgroundColor = config['bg-color']
 
                 const elStyle = document.createElement('style')
                 elStyle.innerHTML = `
