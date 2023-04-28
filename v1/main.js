@@ -57,6 +57,8 @@ let client
 let streamerId
 const isTest = config.test || false
 document.body.onload = () => {
+    console.log(config)
+    loadTheme(config['theme'] || 'style.css')
     if (isTest) {
         getBadges().then((r) => {
             cache.badge['global'] = r
@@ -181,6 +183,14 @@ function addMessage({ type, channel, state, message = '', timeout = config.messa
     elChatBox.appendChild(elUserBox)
     elChatBox.appendChild(elMessage)
 
+    console.log(config.theme)
+    if(config.theme.includes('bullet')) {
+        elChatBox.style.top = `${random(10, 90)}%`
+        elChatBox.style.transform = `translateX(${window.innerWidth}px)`
+        setTimeout(() => {
+            elChatBox.style.transform = `translateX(-${window.innerWidth}px)`
+        }, 500);
+    }
 
     elChat.appendChild(elChatBox)
 
@@ -206,7 +216,6 @@ function parseMessage({ emoteMap, message }) {
     }
     return rv.join(' ')
 }
-
 
 function getUsers({ id, login }) {
     const qs = {}
@@ -271,6 +280,20 @@ function test(user) {
         handleMessage(`#${twitchID}`, state, message.random())
     }, 10000)
     handleMessage(`#${twitchID}`, state, '유쾌했던 땃쥐 토끼풀 쫓기 바쁨')
+}
+
+function loadTheme(theme) {
+    config.theme = theme
+
+    const elHead = document.querySelector('head')
+    const styleSheet = document.createElement('link')
+    styleSheet.href = `./${theme}`
+    styleSheet.rel = 'stylesheet'
+
+    elHead.querySelectorAll('link[rel=stylesheet]').forEach((r) => r.remove())
+    elHead.append(styleSheet)
+
+    document.querySelector('#chat').innerHTML = ''
 }
 
 Array.prototype.random = function () {

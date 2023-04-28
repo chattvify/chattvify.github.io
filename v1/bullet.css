@@ -1,0 +1,28 @@
+#chat {
+    position: absolute;
+    font-weight: 600;
+    font-size: 24px;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    right: 0;
+    width: 100%;
+    box-sizing: border-box;
+    overflow: hidden;
+}
+
+#chat .chat-box {
+    position: absolute;
+    display: flex;
+    padding: 5px;
+    transition: all 10s linear;
+}
+
+#chat .chat-box .user {
+    display: none;
+}
+
+.badge,
+.emotes {
+    width: 1.5em;
+}

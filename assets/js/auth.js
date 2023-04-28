@@ -44,7 +44,8 @@ $(() => {
         btnAuth.parent().show()
         btnUser.parent().hide()
     }
-    
+
+    initTheme()
     loadSample()
 })
 
@@ -82,7 +83,7 @@ $('#twitchId').change(chatUrl)
 function chatUrl() {
     const obj = {
         id: $('#twitchId').val(),
-        token: sessionStorage.getItem('token') || ''
+        token: sessionStorage.getItem('token') || '',
     }
 
     if (obj.token) {
@@ -95,7 +96,7 @@ function chatUrl() {
     }
 }
 
-function loadSample() {    
+function loadSample() {
     const obj = {
         id: $('.btn-user img').attr('tw-id'),
         token: sessionStorage.getItem('token') || '',
@@ -104,6 +105,31 @@ function loadSample() {
     const url = `${location.origin}/v1/chat.html?${btoa(JSON.stringify(obj))}`
 
     const iframe = document.createElement('iframe')
+    iframe.name = 'chat-sample'
     iframe.src = url
     document.querySelector('.chat-sample').append(iframe)
+}
+
+function initTheme() {
+    const theme = [
+        { title: '기본', value: 'style.css' },
+        { title: '탄막', value: 'bullet.css' },
+    ]
+    const elTheme = document.querySelector('#chatTheme')
+
+    theme.forEach(({ title, value }) => {
+        const elOption = document.createElement('option')
+        elOption.title = title
+        elOption.innerText = title
+        elOption.value = value
+        elTheme.append(elOption)
+    })
+
+    elTheme.onchange = (e) => {
+        const { value } = e.target
+        const frm = window['chat-sample']
+        if (frm) {
+            frm.loadTheme(value)
+        }
+    }
 }
