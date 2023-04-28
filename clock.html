@@ -183,6 +183,94 @@ https://github.com/iamkun/dayjs/blob/dev/LICENSE
         .setting textarea {
             resize: none;
         }
+
+        /* snackbar */
+        /* The snackbar - position it at the bottom and in the middle of the screen */
+        .snackbar {
+            visibility: hidden;
+            /* Hidden by default. Visible on click */
+            min-width: 250px;
+            /* Set a default minimum width */
+            margin-left: -125px;
+            /* Divide value of min-width by 2 */
+            background-color: #333;
+            /* Black background color */
+            color: #fff;
+            /* White text color */
+            text-align: center;
+            /* Centered text */
+            border-radius: 20px;
+            /* Rounded borders */
+            padding: 16px;
+            /* Padding */
+            position: fixed;
+            /* Sit on top of the screen */
+            z-index: 11;
+            /* Add a z-index if needed */
+            left: 50%;
+            /* Center the snackbar */
+            bottom: 50px;
+            /* 30px from the bottom */
+        }
+
+        /* Show the snackbar when clicking on a button (class added with JavaScript) */
+        .snackbar.show {
+            visibility: visible;
+            /* Show the snackbar */
+            /* Add animation: Take 0.5 seconds to fade in and out the snackbar.
+  However, delay the fade out process for 2.5 seconds */
+            -webkit-animation: fadein 0.5s, fadeout 0.5s 2.5s;
+            animation: fadein 0.5s, fadeout 0.5s 2.5s;
+        }
+
+        /* Animations to fade the snackbar in and out */
+        @-webkit-keyframes fadein {
+            from {
+                bottom: 0;
+                opacity: 0;
+            }
+
+            to {
+                bottom: 30px;
+                opacity: 1;
+            }
+        }
+
+        @keyframes fadein {
+            from {
+                bottom: 0;
+                opacity: 0;
+            }
+
+            to {
+                bottom: 30px;
+                opacity: 1;
+            }
+        }
+
+        @-webkit-keyframes fadeout {
+            from {
+                bottom: 30px;
+                opacity: 1;
+            }
+
+            to {
+                bottom: 0;
+                opacity: 0;
+            }
+        }
+
+        @keyframes fadeout {
+            from {
+                bottom: 30px;
+                opacity: 1;
+            }
+
+            to {
+                bottom: 0;
+                opacity: 0;
+            }
+        }
     </style>
 </head>
 
@@ -252,12 +340,7 @@ https://github.com/iamkun/dayjs/blob/dev/LICENSE
         <button type="button" class="btn btn-save">저장</button>
     </div>
 
-    
-<!-- <button class="btn" style="position: absolute; bottom: 0;">스낵바 테스트</button>
-
-<div class="snackbar">
-
-</div> -->
+    <div class="snackbar"></div>
 
     <script type="text/javascript">
         const day = function () {
@@ -269,6 +352,17 @@ https://github.com/iamkun/dayjs/blob/dev/LICENSE
             //element.innerHTML = `<div id="time">${dt.format('HH')}<span id="colon">:</span>${dt.format('mm')}</div><div id="date">${dt.format('MM/DD ddd')}</div>`;
         };
         setInterval(day, 1000);
+
+        const snackbar = {
+            show(msg) {
+                const el = document.querySelector('.snackbar')
+                el.innerHTML = msg
+                el.classList.add('show')
+                setTimeout(() => {
+                    el.classList.remove('show')
+                }, 3000);
+            }
+        }
 
         const setting = {
             picker: {},
@@ -289,8 +383,9 @@ https://github.com/iamkun/dayjs/blob/dev/LICENSE
                         "Access-Control-Allow-Methods": "GET",
                         "Access-Control-Allow-Origin": "*"
                     }
-                }).then((res) => {
-                    return res.json() || {
+                }).then(async (res) => {
+                    const data = await res.json()
+                    return Object.keys(data).length ? data : {
                         'live': 'TACHIO',
                         'text-color': '#000000',
                         'border-color': '#000000',
@@ -378,9 +473,9 @@ https://github.com/iamkun/dayjs/blob/dev/LICENSE
                 })
             },
             loadConfig() {
-                document.querySelector('input[name=live]').value = decodeURIComponent(setting.config[name])
+                document.querySelector('input[name=live]').value = decodeURIComponent(setting.config['live'])
                 document.querySelector('input[name=clock-url]').value = `${location.origin}${location.pathname}?${setting.uuid}`
-                document.querySelector('[name=webfont]').value = setting.config['webfont']
+                document.querySelector('[name=webfont]').value = setting.config['webfont'] || ''
             },
             render() {
                 const font = (setting.config['webfont']).replace('@font-face ', '').replace('{', '').replace('}', '').replaceAll('\n', '').trim()
@@ -412,16 +507,15 @@ body {
                 document.querySelector('head').appendChild(elStyle)
             },
             save() {
-                const config = {
-                    'live': encodeURIComponent(document.querySelector('input[name=live]').value),
-                    'text-color': this.picker['text-color'].getColor().toRGBA().toString(),
-                    'border-color': this.picker['border-color'].getColor().toRGBA().toString(),
-                    'bg-color': this.picker['bg-color'].getColor().toRGBA().toString(),
-                    'webfont': document.querySelector('textarea.webfont').value.replaceAll('\n', '').trim()
-                }
                 fetch(`https://loa-on.snorlaxh.workers.dev/clock/${setting.uuid}`, {
                     method: 'POST',
-                    body: JSON.stringify(setting.config),
+                    body: JSON.stringify({
+                        'live': encodeURIComponent(document.querySelector('input[name=live]').value),
+                        'text-color': this.picker['text-color'].getColor().toRGBA().toString(),
+                        'border-color': this.picker['border-color'].getColor().toRGBA().toString(),
+                        'bg-color': this.picker['bg-color'].getColor().toRGBA().toString(),
+                        'webfont': document.querySelector('textarea.webfont').value.replaceAll('\n', '').trim()
+                    }),
                     headers: {
                         "Access-Control-Allow-Headers": "*",
                         "Access-Control-Allow-Methods": "POST",
@@ -431,8 +525,11 @@ body {
                     this.init()
                     const url = `${location.origin}${location.pathname}?${setting.uuid}`
                     document.querySelector('[name=clock-url]').value = url
-                    location.replace(url)
-                    //this.toggle()
+                    snackbar.show('저장됨')
+
+                    if (!location.search) {
+                        location.replace(url)
+                    }
                 })
             },
             toggle() {
@@ -458,10 +555,10 @@ body {
 
         document.querySelector('.btn-copy').onclick = (e) => {
             navigator.clipboard.writeText(document.querySelector('[name=clock-url]').value).then(() => {
-                console.log('Content copied to clipboard');
+                snackbar.show('클립보드에 복사 성공')
                 /* Resolved - 클립보드에 복사 성공 */
             }, () => {
-                console.error('Failed to copy');
+                snackbar.show('클립보드에 복사 실패')
                 /* Rejected - 클립보드에 복사 실패 */
             });
         }
