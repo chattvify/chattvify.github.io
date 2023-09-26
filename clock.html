@@ -327,6 +327,24 @@ https://github.com/iamkun/dayjs/blob/dev/LICENSE
         </div>
 
         <div>
+            <label for="useDate">날짜 표시</label>
+            <input type="checkbox" name="useDate">
+        </div>
+
+        <div>
+            <label for="round">모서리 라운드 처리</label>
+            <label>
+                <input type="radio" id="roundUp" name="round" value="0"> 위
+            </label>
+            <label>
+                <input type="radio" id="roundDown" name="round" value="1"> 아래
+            </label>
+            <label>
+                <input type="radio" id="roundNone" name="round" value="2"> 없음
+            </label>
+        </div>
+
+        <div>
             <label for="webfont">웹 폰트</label>
             <textarea name="webfont" rows="10" class="webfont"></textarea>
         </div>
@@ -393,6 +411,8 @@ https://github.com/iamkun/dayjs/blob/dev/LICENSE
                         'opacity': 70,
                         'webfont': '',
                         'url': '',
+                        'useDate': 1,
+                        'round': 1
                     }
                 })
             },
@@ -476,6 +496,9 @@ https://github.com/iamkun/dayjs/blob/dev/LICENSE
                 document.querySelector('input[name=live]').value = decodeURIComponent(setting.config['live'])
                 document.querySelector('input[name=clock-url]').value = `${location.origin}${location.pathname}?${setting.uuid}`
                 document.querySelector('[name=webfont]').value = setting.config['webfont'] || ''
+                document.querySelector(`input[name=useDate]`).checked = setting.config['useDate'] == 1
+                const round = setting.config['round'] || 1
+                document.querySelectorAll(`input[name=round]`)[round].checked = true
             },
             render() {
                 const font = (setting.config['webfont']).replace('@font-face ', '').replace('{', '').replace('}', '').replaceAll('\n', '').trim()
@@ -496,7 +519,12 @@ https://github.com/iamkun/dayjs/blob/dev/LICENSE
                 document.body.style.color = setting.config['text-color']
                 document.querySelector('#time').style.borderColor = setting.config['border-color']
 
-                document.querySelector('.nowtime').style.backgroundColor = setting.config['bg-color']
+                const now = document.querySelector('.nowtime')
+                now.style.backgroundColor = setting.config['bg-color']
+                now.style.borderRadius = `${setting.config['round'] == '0' ? '10px 10px' : '0 0'} ${setting.config['round'] == '1' ? '10px 10px' : '0 0'}`.trim()
+                console.log(`${setting.config['round'] == '0' ? '10px 10px' : ''} ${setting.config['round'] == '1' ? '10px 10px' : ''}`.trim())
+
+                document.querySelector('#date').style.display = setting.config['useDate'] == 1 ? 'block' : 'none'
 
                 const elStyle = document.createElement('style')
                 elStyle.innerHTML = `
@@ -514,7 +542,9 @@ body {
                         'text-color': this.picker['text-color'].getColor().toRGBA().toString(),
                         'border-color': this.picker['border-color'].getColor().toRGBA().toString(),
                         'bg-color': this.picker['bg-color'].getColor().toRGBA().toString(),
-                        'webfont': document.querySelector('textarea.webfont').value.replaceAll('\n', '').trim()
+                        'webfont': document.querySelector('textarea.webfont').value.replaceAll('\n', '').trim(),
+                        'useDate': document.querySelector('input[name=useDate]').checked,
+                        'round': document.querySelectorAll(`input[name=round]:checked`)[0].value
                     }),
                     headers: {
                         "Access-Control-Allow-Headers": "*",
@@ -567,7 +597,7 @@ body {
             const { value } = e.target
             const color = setting.picker['bg-color'].getColor().toRGBA()
             const alpha = Number(value) || 0
-            
+
             color[3] = alpha / 100
 
             setting.picker['bg-color'].setColor(`rgba(${color.map((v) => v)})`)
