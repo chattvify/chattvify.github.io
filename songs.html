@@ -1,0 +1,37 @@
+---
+title: Songs
+layout: empty
+permalink: /songs/
+---
+
+{% if page.url == "/songs/" %}
+<div class="flex flex-col m-2 px2-2 py-4 rounded-lg" lv-sr-box>
+    <b class="text-2xl text-center">테스트</h4>
+</div>
+{% endif %}
+
+{% if page.url == "/songs/edit" %}
+<div class="flex flex-col m-2 px2-2 py-4 rounded-lg" lv-sr-box>
+    <div>
+        <label for="srTitle" class="block text-sm font-medium leading-6 text-gray-900">제목</label>
+        <input type="text" name="srTitle" class="block flex-1 border-0 bg-transparent py-1.5 pl-1 text-gray-900" />
+    </div>
+    <div>
+        <label for="srContent" class="block text-sm font-medium leading-6 text-gray-900">내용</label>
+        <textarea id="about" name="about" rows="3" class="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"></textarea>
+    </div>
+</div>
+{% endif %}
+
+<script type="text/javascript">
+    $(() => {
+        const isUuid = !!location.search
+        const uuid = isUuid ? location.search.substring(1) : crypto.randomUUID()
+        if (!isUuid) {
+            location.search = `?${uuid}`
+        }
+        const data = JSON.parse(localStorage.getItem('SR_DATA')) || {}
+
+
+    })   
+</script>

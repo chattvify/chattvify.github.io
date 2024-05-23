@@ -22,28 +22,28 @@ $(() => {
         }
     }
 
-    const elAuth = $('.require-auth')
-    const btnAuth = $('.btn-auth')
-    const btnUser = $('.btn-user')
-    if (sessionStorage.getItem('token')) {
-        elAuth.hide()
-        btnAuth.parent().hide()
-        btnUser.parent().show()
+    // const elAuth = $('.require-auth')
+    // const btnAuth = $('.btn-auth')
+    // const btnUser = $('.btn-user')
+    // if (sessionStorage.getItem('token')) {
+    //     elAuth.hide()
+    //     btnAuth.parent().hide()
+    //     btnUser.parent().show()
 
-        getUsers({}).then((res) => {
-            const { id, login, display_name, profile_image_url } = res
-            const img = document.createElement('img')
-            img.src = profile_image_url
-            img.title = display_name
-            img.setAttribute('tw-id', login)
-            btnUser.append(img)
-        })
-    }
-    else {
-        elAuth.show()
-        btnAuth.parent().show()
-        btnUser.parent().hide()
-    }
+    //     getUsers({}).then((res) => {
+    //         const { id, login, display_name, profile_image_url } = res
+    //         const img = document.createElement('img')
+    //         img.src = profile_image_url
+    //         img.title = display_name
+    //         img.setAttribute('tw-id', login)
+    //         btnUser.append(img)
+    //     })
+    // }
+    // else {
+    //     elAuth.show()
+    //     btnAuth.parent().show()
+    //     btnUser.parent().hide()
+    // }
 
     initTheme()
     loadSample()
@@ -78,24 +78,6 @@ const api = ({ base = 'https://api.twitch.tv/helix/', endpoint = '', data, heade
     }).then((res) => res.json())
 }
 
-$('#twitchId').change(chatUrl)
-
-function chatUrl() {
-    const obj = {
-        id: $('#twitchId').val(),
-        token: sessionStorage.getItem('token') || '',
-    }
-
-    if (obj.token) {
-        const url = `${location.origin}/v1/chat.html?${btoa(JSON.stringify(obj))}`
-
-        $('#chatURL').val(url)
-    }
-    else {
-        $('#chatURL').val('트위치 로그인 버튼을 눌러 로그인 해주세요.')
-    }
-}
-
 function loadSample() {
     const obj = {
         id: $('.btn-user img').attr('tw-id'),
@@ -117,19 +99,21 @@ function initTheme() {
     ]
     const elTheme = document.querySelector('#chatTheme')
 
-    theme.forEach(({ title, value }) => {
-        const elOption = document.createElement('option')
-        elOption.title = title
-        elOption.innerText = title
-        elOption.value = value
-        elTheme.append(elOption)
-    })
+    if (elTheme) {
+        theme.forEach(({ title, value }) => {
+            const elOption = document.createElement('option')
+            elOption.title = title
+            elOption.innerText = title
+            elOption.value = value
+            elTheme.append(elOption)
+        })
 
-    elTheme.onchange = (e) => {
-        const { value } = e.target
-        const frm = window['chat-sample']
-        if (frm) {
-            frm.loadTheme(value)
+        elTheme.onchange = (e) => {
+            const { value } = e.target
+            const frm = window['chat-sample']
+            if (frm) {
+                frm.loadTheme(value)
+            }
         }
     }
 }
