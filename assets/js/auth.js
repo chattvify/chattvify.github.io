@@ -111,6 +111,7 @@ function initTheme() {
     const theme = [
         { title: '기본', value: 'style.css' },
         { title: '탄막', value: 'bullet.css' },
+        { title: '카카오톡', value: 'kakao.css' },
     ]
     const elTheme = document.querySelector('#chatTheme')
 
