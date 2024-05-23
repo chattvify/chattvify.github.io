@@ -6,47 +6,74 @@ background: '/img/bg-index.jpg'
 
 <!-- Home Intro
 ================================================== -->
-{% if page.url == "/" %} 
-<!-- <div class="rounded mb-5 hero">
-  <div class="row align-items-center justify-content-between">
-    <div class="col-md-6">
-      <h1 class="font-weight-bold mb-4 serif-font">Let me  teach you how to become successful online</h1>
-      <p class="lead mb-4">My name is Lyam and I'm here to share with you my knowledge and experience of over 10 years of monetizing my blog.</p>
-      <a href="{{site.baseurl}}/about" class="btn btn-dark text-white px-5 btn-lg">About me</a>
-
-    </div>
-    <div class="col-md-6 text-right pl-0 pl-lg-4">
-      <img class="intro" height="500" src="{{site.baseurl}}/assets/images/intro.svg">      
-    </div>
+{% if page.url == "/" %}
+<div>
+  <div
+    class="flex rounded-md ml-1 shadow-sm ring-1 ring-inset ring-gray-300 focus-within:ring-2 focus-within:ring-inset focus-within:ring-indigo-600 sm:max-w-md rounded">
+    <span class="flex select-none items-center px-2 text-black-500 sm:text-sm bg-chzzk2">chzzk.naver.com/live/</span>
+    <input type="text" name="chzzkName" id="chzzkName"
+      class="block flex-1 border-0 bg-transparent py-1.5 pl-1 text-gray-900 placeholder:text-gray-400 focus:ring-0 sm:text-sm sm:leading-6"
+      placeholder="치지직 주소">
   </div>
-</div> -->
 
-<div class="rounded mb-5" style="position: relative;">
-  <div class="row align-items-center justify-content-between">
-    <div class="col-md-6">
-      <div class="input-group mb-3">
-        <label for="inputTwitchID" class="col-sm-3 col-form-label">치치직 고유 키 입력</label>
-        <div class="input-group-prepend">
-          <span class="input-group-text" id="basic-addon1">https://chzzk.naver.com/live/</span>
+  <ul role="list" class="mt-2 divide-y divide-gray-100">
+    <li class="flex flex-col justify-between gap-x-6 py-1" lv-collapsed>
+      <button
+        class="group relative flex w-full items-center border-2 border-chzzk bg-white px-5 py-4 text-left text-base text-neutral-800 transition"
+        type="button" lv-collapsed-btn>
+        채팅창 오버레이(미완성)
+        <span class="-me-1 ms-auto h-5 w-5 shrink-0 rotate-[-180deg] transition-transform duration-200 ease-in-out">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+            stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" />
+          </svg>
+        </span>
+      </button>
+      <div class="rounded mb-5 border-x-2 border-b-2 border-chzzk rounded-b-lg transition" style="position: relative;"
+        lv-collapsed-item>
+        <div class="row align-items-center justify-content-between">
+          <div class="col-md-6">
+            <div class="input-group mb-3">
+              <label for="selectTheme" class="col-sm-3 col-form-label">Theme</label>
+              <select id="chatTheme" name="selectTheme" class="form-control"></select>
+            </div>
+            <div class="input-group mb-3">
+              <label for="inputChatURL" class="col-sm-3 col-form-label">Chatbox URL</label>
+              <input type="text" id="chatURL" name="inputChatURL" class="form-control" lv-chzzk-url="v1/chat" readonly>
+              <div class="input-group-append">
+                <button class="btn btn-outline-primary" type="button" lv-btn-copy="chatURL">Copy</button>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-6 chat-sample"></div>
         </div>
-        <input type="text" id="chzzkId" name="inputTwitchID" class="form-control" placeholder="https://chzzk.naver.com/live/고유키" aria-label="치지직 고유 키" aria-describedby="basic-addon1">
-        <div class="input-group-append">
-          <span class="input-group-text">/chat</span>
+    </li>
+    <li class="flex flex-col justify-between gap-x-6 py-1" lv-collapsed>
+      <button
+        class="group relative flex w-full items-center border-chzzk border-2 bg-white px-5 py-4 text-left text-base text-neutral-800 transition"
+        type="button" lv-collapsed-btn>
+        노래책 대기열
+        <span class="-me-1 ms-auto h-5 w-5 shrink-0 rotate-[-180deg] transition-transform duration-200 ease-in-out">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+            stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" />
+          </svg>
+        </span>
+      </button>
+      <div class="py-4 border-x-2 border-b-2 border-chzzk  rounded-b-lg transition" style="position: relative;"
+        lv-collapsed-item>
+        <div class="row align-items-center justify-content-between">
+          <div class="col-md-6">
+            <div class="input-group mb-3">
+              <label for="inputQueueURL" class="col-sm-3 col-form-label">노래 대기열 URL</label>
+              <input type="text" id="queueURL" name="inputQueueURL" class="form-control" lv-chzzk-url="songs" readonly>
+              <div class="input-group-append">
+                <button class="btn btn-outline-primary" type="button" lv-btn-copy="inputQueueURL">Copy</button>
+              </div>
+            </div>
+          </div>
         </div>
-      </div>
-      <div class="input-group mb-3">
-        <label for="selectTheme" class="col-sm-3 col-form-label">Theme</label>
-        <select id="chatTheme" name="selectTheme" class="form-control"></select>
-      </div>
-      <div class="input-group mb-3">
-        <label for="inputChatURL" class="col-sm-3 col-form-label">Chatbox URL</label>
-        <input type="text" id="chatURL" name="inputChatURL" class="form-control" readonly>
-        <div class="input-group-append">
-          <button class="btn btn-outline-primary" type="button">Copy</button>
-        </div>
-      </div>
-    </div>
-    <div class="col-md-6 chat-sample"></div>
-  </div>
+    </li>
+  </ul>
 </div>
 {% endif %}

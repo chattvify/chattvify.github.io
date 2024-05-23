@@ -40,3 +40,23 @@ body {}
     background: rgba(0,0,0,0.35);
     border: none;
 }
+
+.color-chzzk {
+    color: #00ffa3;
+}
+
+.border-chzzk,
+.border-chzzk:active {
+    border-color: #bae5d8!important;
+}
+
+.border-chzzk:focus {
+    outline: #bae5d8!important;
+}
+
+.bg-chzzk {
+    background-color: #bae5d8;
+}
+.bg-chzzk2 {
+    background-color: #00ffa3;
+}

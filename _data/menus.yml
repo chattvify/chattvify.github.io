@@ -15,6 +15,12 @@ topmenu:
   url: "#"
   class: "btn-user"
 
+- title:
+  url: "songs/"
+
+- title:
+  url: "songs/edit/"
+
 # Footer Menu
 footermenu:
 

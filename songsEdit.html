@@ -1,0 +1,161 @@
+---
+title: Songs
+layout: empty
+permalink: /songs/edit/
+---
+
+{% if page.url == "/songs/edit/" %}
+<div class="flex flex-col m-2 px2-2 py-4 rounded-lg gap-y-2" lv-sr-box>
+    <div>
+        <label for="srTitle" class="block text-sm font-medium leading-6 text-gray-900">제목</label>
+        <input type="text" name="srTitle"
+            class="block flex-1 w-full border-0 bg-transparent py-1.5 pl-1 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6" />
+    </div>
+    <div>
+        <label for="srContent" class="block text-sm font-medium leading-6 text-gray-900">내용</label>
+        <textarea id="about" name="about" rows="3"
+            class="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"></textarea>
+    </div>
+
+    <div class="flex mt-2 gap-x-2">
+        <button type="button" id="btnSave"
+            class="flex-1 rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600">저장</button>
+
+        <button type="button" id="btnCancel"
+            class="flex-1 border-2 rounded-md bg-transparent font-semibold leading-6 text-gray-900">취소</button>
+    </div>
+
+    <div class="mt-4">
+        <label for="srDirect" class="text-sm font-medium leading-6 text-gray-900">신청곡 목록</label>
+        <button id="srReset" class="btn btn-sm btn-outline-danger ml-2" type="button">초기화</button>
+        <div class="mt-2 input-group">
+            <input type="text" id="srDirect" name="srDirect"
+                class="form-control rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+                placeholder="직접추가">
+            <div class="input-group-append">
+                <button id="srAdd" class="btn btn-outline-primary" type="button">추가</button>
+            </div>
+        </div>
+        <ul role="list" class="px-2 divide-y divide-gray-100" lv-sr-list></ul>
+    </div>
+</div>
+{% endif %}
+
+<script type="text/javascript">
+    $(() => {
+        const isUuid = !!location.search
+        const uuid = isUuid ? location.search.substring(1) : crypto.randomUUID()
+        if (!isUuid) {
+            location.search = `?${uuid}`
+        }
+
+
+        const config = {
+            data: {},
+            get() {
+                this.data = JSON.parse(localStorage.getItem('SR_DATA')) || {
+                    IS_ENABLE: true,
+                    SR_TITLE: '',
+                    SR_CONTENT: ''
+                }
+            },
+            save() {
+
+            },
+            cancel() {
+
+            }
+        }
+
+        const list = {
+            data: [],
+            get() {
+                this.data = JSON.parse(localStorage.getItem('SR_LIST')) || []
+                this.render()
+            },
+            add() {
+                const { value } = document.querySelector('#srDirect')
+                if (value) {
+                    this.data.push({ TITLE: value, IS_DISABLED: false })
+                    localStorage.setItem('SR_LIST', JSON.stringify(this.data))
+                    this.render()
+                    document.querySelector('#srDirect').value = ''
+                }
+            },
+            remove(index) {
+                this.data.splice(index, 1)
+                localStorage.setItem('SR_LIST', JSON.stringify(this.data))
+                this.render()
+            },
+            clear() {
+                localStorage.removeItem('SR_LIST')
+                this.get()
+            },
+            render() {
+                const srList = document.querySelector('[lv-sr-list]')
+
+                srList.innerHTML = ''
+                this.data.forEach((r, index) => {
+                    const elItem = document.createElement('li')
+                    elItem.className = 'flex justify-between gap-x-6 py-3'
+                    elItem.innerHTML = `<div class="flex min-w-0 gap-x-4">
+                        <div class="min-w-0 flex-auto">
+                            <p class="text-base font-semibold leading-6 text-gray-900">${r.TITLE}</p>
+                        </div>
+                        <div class="flex-3">
+                            <button type="button" class="btn btn-sm btn-outline-success" lv-sr-submit=${index}>완료</button>
+                            <button type="button" class="btn btn-sm btn-outline-danger" lv-sr-remove=${index}>삭제</button>
+                        </div>
+                    </div>`;
+                    srList.appendChild(elItem)
+                })
+            }
+        }
+
+        config.get()
+        list.get()
+
+        /* 이벤트 리스너 시작 */
+        document.querySelector('[lv-sr-list]').addEventListener('click', (e) => {
+            const el = e.target
+            const { nodeName } = el
+            if (nodeName == 'BUTTON') {
+                if (el.hasAttribute('lv-sr-submit')) {
+                    const index = el.getAttribute('lv-sr-submit')
+                    console.log('완료', index)
+                }
+                else if (el.hasAttribute('lv-sr-remove')) {
+                    const index = el.getAttribute('lv-sr-remove')
+                    console.log('삭제', index)
+                }
+            }
+        })
+
+        const elReset = document.querySelector('#srReset')
+        if(elReset) {
+            const handleReset = (e) => {
+                list.clear()
+            }
+            elReset.removeEventListener('click', handleReset)
+            elReset.addEventListener('click', handleReset)
+        }
+
+        const elDirect = document.querySelector('#srDirect')
+        if (elDirect) {
+            const handleEnter = (e) => {
+                if (e.which == 13) {
+                    list.add()
+                }
+            }
+            elDirect.removeEventListener('keyup', handleEnter)
+            elDirect.addEventListener('keyup', handleEnter)
+        }
+
+        const elSrAdd = document.querySelector('#srAdd')
+        if (elSrAdd) {
+            elSrAdd.removeEventListener('click', list.add)
+            elSrAdd.addEventListener('click', list.add)
+        }
+        /* 이벤트 리스너 끝*/
+    })   
+</script>
