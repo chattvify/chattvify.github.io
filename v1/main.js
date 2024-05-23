@@ -91,9 +91,13 @@ function addListener() {
     })
 
     client.on('connected', () => {
-        getBadges().then((r) => {
-            cache.badge['global'] = r
-        })
+        try {
+            getBadges().then((r) => {
+                cache.badge['global'] = r
+            })
+        } catch (e) {
+
+        }
     })
 
     client.on('join', () => {
@@ -146,6 +150,10 @@ function addMessage({ type, channel, state, message = '', timeout = config.messa
     const elMessage = document.createElement('span')
 
     elChatBox.classList.add('chat-box')
+    if (twitchID == userName) {
+        elChatBox.classList.add('subscriber')
+    }
+    elChatBox.classList.add()
     elUserBox.classList.add('user')
     elUserImg.classList.add('profile')
     elUserName.classList.add('user-name')
@@ -183,8 +191,7 @@ function addMessage({ type, channel, state, message = '', timeout = config.messa
     elChatBox.appendChild(elUserBox)
     elChatBox.appendChild(elMessage)
 
-    console.log(config.theme)
-    if(config.theme.includes('bullet')) {
+    if (config.theme.includes('bullet')) {
         elChatBox.style.top = `${random(10, 90)}%`
         elChatBox.style.transform = `translateX(${window.innerWidth}px)`
         setTimeout(() => {
@@ -195,7 +202,7 @@ function addMessage({ type, channel, state, message = '', timeout = config.messa
     elChat.appendChild(elChatBox)
 
     setTimeout(() => {
-        //elChatBox.remove()
+        if (!isTest) elChatBox.remove()
     }, timeout)
 }
 

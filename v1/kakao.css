@@ -1,0 +1,22 @@
+#chat {
+    position: absolute;
+    font-weight: 600;
+    font-size: 24px;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    box-sizing: border-box;
+    padding: 100px 15px 1em;
+    overflow: hidden;
+}
+
+#chat .chat-box {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    padding: 0.5em 1em;
+    margin-top: 1em;
+    border-left: 0.3em solid;
+    background-color: white;
+    filter: drop-shadow(5px 5px 3px #1b1a1a);   
+}

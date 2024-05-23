@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chattvify</title>
+
+    <script>
+        const token = new Map(Object.entries(JSON.parse(atob(location.search.substring(1))))) || new Map()
+
+        var twitchID = ''
+        const params = {}
+
+        token.forEach((v, k) => {
+            params[k] = v
+        })
+        sessionStorage.setItem('config', JSON.stringify(params))
+
+        if (token.has('id') && params.id.length) {
+            twitchID = params.id
+        }
+
+        document.title = `Chattvify - ${twitchID || 'v1'}`
+    </script>
+</head>
+
+<body>
+    <div id="chat"></div>
+    <script src="./tmi.js" type="text/javascript"></script>
+    <script src="./main.js" type="text/javascript"></script>
+</body>
+
+</html>

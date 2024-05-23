@@ -22,11 +22,9 @@ $(() => {
         }
     }
 
-    const elAuth = $('.require-auth')
     const btnAuth = $('.btn-auth')
     const btnUser = $('.btn-user')
     if (sessionStorage.getItem('token')) {
-        elAuth.hide()
         btnAuth.parent().hide()
         btnUser.parent().show()
 
@@ -40,7 +38,6 @@ $(() => {
         })
     }
     else {
-        elAuth.show()
         btnAuth.parent().show()
         btnUser.parent().hide()
     }
