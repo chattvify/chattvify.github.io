@@ -31,6 +31,49 @@
     }
   });
 
+  const chatUrl = () => {
+    const name = document.querySelector('#chzzkName')
+    const obj = {
+      id: document.querySelector('#chzzkName').value
+    }
+
+    if (name.value.length) {
+      document.querySelectorAll('[lv-chzzk-url]').forEach((el) => {
+        el.value = `${location.origin}/${el.getAttribute('lv-chzzk-url')}/?${btoa(JSON.stringify(obj))}`
+      })
+    }
+    else {
+      document.querySelectorAll('[lv-chzzk-url]').forEach((el, index) => {
+        el.value = `치지직 주소를 입력해주세요.`
+        if (index == document.querySelectorAll('[lv-chzzk-url]').length - 1) {
+          name.focus()
+        }
+      })
+    }
+  }
+  if (document.querySelector('#chzzkName')) {
+    document.querySelector('#chzzkName').value = localStorage.getItem('CHZZK_KEY') || ''
+    if (localStorage.getItem('CHZZK_KEY')) {
+      chatUrl()
+    }
+  }
+
+  document.querySelector('#chzzkSave').addEventListener('click', () => {
+    const name = document.querySelector('#chzzkName')
+    localStorage.setItem('CHZZK_KEY', name.value)
+    chatUrl()
+  })
+
+  document.querySelector('#queueOpen').addEventListener('click', () => {
+    const url = document.querySelector('#queueURL').value
+    window.open(url)
+  })
+  
+  document.querySelector('#queueSetting').addEventListener('click', () => {
+    const url = document.querySelector('#queueURL').value
+    window.open(`${url.replace('/songs/', '/songs/edit/')}`)
+  })
+
   document.querySelectorAll('[lv-btn-copy]').forEach((el) => {
     const handleBtn = () => {
       const name = el.getAttribute('lv-btn-copy')
@@ -39,6 +82,9 @@
 
       navigator.clipboard.writeText(copy)
     }
+
+    el.removeEventListener('click', handleBtn)
+    el.addEventListener('click', handleBtn)
   })
 
   document.querySelectorAll('[lv-collapsed]').forEach((el) => {
@@ -82,34 +128,6 @@
     btn.addEventListener('click', handleBtn)
     render()
   })
-
-
-  const chatUrl = () => {
-    const name = document.querySelector('#chzzkName')
-    const obj = {
-      id: document.querySelector('#chzzkName').value
-    }
-
-    if (name.value.length) {
-      document.querySelectorAll('[lv-chzzk-url]').forEach((el) => {
-        el.value = `${location.origin}/${el.getAttribute('lv-chzzk-url')}/?${btoa(JSON.stringify(obj))}`
-      })
-    }
-    else {
-      document.querySelectorAll('[lv-chzzk-url]').forEach((el, index) => {
-        el.value = `치지직 주소를 입력해주세요.`
-        if (index == document.querySelectorAll('[lv-chzzk-url]').length - 1) {
-          name.focus()
-        }
-      })
-    }
-  }
-
-  if (document.querySelector('#chzzkName')) {
-    document.querySelector('#chzzkName').removeEventListener('blur', chatUrl)
-    document.querySelector('#chzzkName').addEventListener('blur', chatUrl)
-  }
-
 })(jQuery);
 
 // Blank Target External Links

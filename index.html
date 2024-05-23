@@ -11,9 +11,12 @@ background: '/img/bg-index.jpg'
   <div
     class="flex rounded-md ml-1 shadow-sm ring-1 ring-inset ring-gray-300 focus-within:ring-2 focus-within:ring-inset focus-within:ring-indigo-600 sm:max-w-md rounded">
     <span class="flex select-none items-center px-2 text-black-500 sm:text-sm bg-chzzk2">chzzk.naver.com/live/</span>
-    <input type="text" name="chzzkName" id="chzzkName"
-      class="block flex-1 border-0 bg-transparent py-1.5 pl-1 text-gray-900 placeholder:text-gray-400 focus:ring-0 sm:text-sm sm:leading-6"
-      placeholder="치지직 주소">
+    <div class="input-group">
+      <input type="text" name="chzzkName" id="chzzkName"
+        class="block flex-1 border-0 bg-transparent py-1.5 pl-1 text-gray-900 placeholder:text-gray-400 focus:ring-0 sm:text-sm sm:leading-6"
+        placeholder="치지직 주소">
+      <button class="btn btn-outline-success" type="button" id="chzzkSave">저장</button>
+    </div>
   </div>
 
   <ul role="list" class="mt-2 divide-y divide-gray-100">
@@ -70,6 +73,10 @@ background: '/img/bg-index.jpg'
               <div class="input-group-append">
                 <button class="btn btn-outline-primary" type="button" lv-btn-copy="inputQueueURL">Copy</button>
               </div>
+              <button type="button" id="queueOpen"
+                class="ml-2 rounded-md bg-slate-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-slate-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-slate-600">열기</button>
+              <button type="button" id="queueSetting"
+                class="ml-2 rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600">설정</button>
             </div>
           </div>
         </div>
