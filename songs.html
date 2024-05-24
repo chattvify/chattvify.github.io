@@ -35,28 +35,37 @@ permalink: /songs/
 
         const toon = {
             payload: '',
-            get() {
-                $.ajax({
-                    url: `https://toon.at/widget/alertbox/${config.TOON_KEY}`,
-                    dataType: 'jsonp',
-                    jsonpCallback: 'parsePayload',
-                    success(data) {
-                        console.log('success', data)
-                    },
-                    error(xhr) {
-                        console.log(xhr)
-                    }
-                })
+            socket: null,
+            async get() {
+                const url = `https://toon.at/widget/alertbox/${config.TOON_KEY}`
+                const res = await fetch(`https://corsproxy.io/?${encodeURIComponent(url)}`)
+                const html = await res.text()
+
+                this.payload = this.parse(html)
+                if (this.payload) {
+                    this.socket = new WebSocket(`wss://toon.at:8071/${this.payload}`)
+                }
+                else {
+                    toast('투네이션 페이로드를 찾을 수 없습니다.')
+                }
+                // const iframe = document.createElement('iframe')
+                // iframe.id = 'toon'
+                // iframe.src = `https://toon.at/widget/alertbox/${config.TOON_KEY}`
+                // document.body.append(iframe)
                 // console.log(res.body())
-            }
+            },
+            parse(data) {
+                const regex = /"payload":"(.*)",/
+                if (regex.test(data)) {
+                    console.log(regex.exec(data))
+                    return regex.exec(data)[1]
+                }
+                return null
+            },
         }
 
-        toon.get()
-
-        window.toon = toon
+        if (config.TOON_KEY) {
+            toon.get()
+        }
     })
-
-    function parsePayload(data) {
-        console.log('parse', data)
-    }
 </script>
