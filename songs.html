@@ -26,6 +26,9 @@ permalink: /songs/
             location.search = `?${uuid}`
         }
         const config = JSON.parse(localStorage.getItem('SR_DATA')) || {}
+        if(!localStorage.getItem('SR_LIST')) {
+            localStorage.setItem('SR_LIST', JSON.stringify([]))
+        }
 
         const toon = {
             payload: '',
