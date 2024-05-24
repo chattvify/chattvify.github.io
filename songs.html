@@ -5,7 +5,7 @@ permalink: /songs/
 ---
 
 {% if page.url == "/songs/" %}
-<div class="flex flex-col mx-4 my-2 px-3 py-4 rounded-lg sr-box shadow-xl">
+<div class="flex flex-col w-4/12 mx-4 my-2 px-3 py-4 rounded-lg sr-box shadow-xl">
     <b id="srTitle" class="text-2xl text-center srColor"></b>
     <div id="srContent" class="text-center srColor"></div>
     <div id="srStatus" class="text-center srColor"></div>
@@ -25,9 +25,9 @@ permalink: /songs/
         if (!isUuid) {
             location.search = `?${uuid}`
         }
-        const config = JSON.parse(localStorage.getItem('SR_DATA')) || {}
-        if(!localStorage.getItem('SR_LIST')) {
-            localStorage.setItem('SR_LIST', JSON.stringify([]))
+        const config = JSON.parse(window.localStorage.getItem('SR_DATA')) || {}
+        if(!window.localStorage.getItem('SR_LIST')) {
+            window.localStorage.setItem('SR_LIST', JSON.stringify([]))
         }
 
         const toon = {
@@ -152,9 +152,9 @@ permalink: /songs/
         }
 
         const add = (msg) => {
-            const list = JSON.parse(localStorage.getItem('SR_LIST'))
+            const list = JSON.parse(window.localStorage.getItem('SR_LIST'))
             list.push({ TITLE: msg, IS_DONE: false })
-            localStorage.setItem('SR_LIST', JSON.stringify(list))
+            window.localStorage.setItem('SR_LIST', JSON.stringify(list))
         }
 
         const render = (type) => {
@@ -170,8 +170,8 @@ permalink: /songs/
                 document.querySelector('#srList').style.color = config.srColor || '#000000'
             }
             if (!type || type == 'list') {
-                const isUse = localStorage.getItem('SR_USE') == undefined ? true : localStorage.getItem('SR_USE') == 'true'
-                const data = JSON.parse(localStorage.getItem('SR_LIST'))
+                const isUse = window.localStorage.getItem('SR_USE') == undefined ? true : window.localStorage.getItem('SR_USE') == 'true'
+                const data = JSON.parse(window.localStorage.getItem('SR_LIST'))
                 const done = data.filter((r) => r.IS_DONE)
                 const left = data.filter((r) => !r.IS_DONE)
 
@@ -187,7 +187,7 @@ permalink: /songs/
         render()
 
         setInterval(() => {
-            const data = JSON.parse(localStorage.getItem('SR_DATA'))
+            const data = JSON.parse(window.localStorage.getItem('SR_DATA'))
             if (data.CID != config.CID) {
                 Object.keys(data).forEach((k) => {
                     config[k] = data[k]

@@ -177,7 +177,7 @@ permalink: /songs/edit/
                 });
             },
             get() {
-                this.data = JSON.parse(localStorage.getItem('SR_DATA')) || {
+                this.data = JSON.parse(window.localStorage.getItem('SR_DATA')) || {
                     IS_CHEESE: false,
                     TITLE: '',
                     CONTENT: '',
@@ -191,7 +191,7 @@ permalink: /songs/edit/
             },
             render() {
                 this.initPicker()
-                document.querySelector('#srUse').checked = localStorage.getItem('SR_USE') == undefined ? true : localStorage.getItem('SR_USE') == 'true'
+                document.querySelector('#srUse').checked = window.localStorage.getItem('SR_USE') == undefined ? true : window.localStorage.getItem('SR_USE') == 'true'
                 document.querySelector('#srTitle').value = this.data.TITLE
                 document.querySelector('#srContent').value = this.data.CONTENT
                 document.querySelector('#srToonKey').value = this.data.TOON_KEY
@@ -201,8 +201,8 @@ permalink: /songs/edit/
             },
             toggle() {
                 this.data.CID = new Date().getTime()
-                localStorage.setItem('SR_DATA', JSON.stringify(this.data))
-                localStorage.setItem('SR_USE', document.querySelector('#srUse').checked)
+                window.localStorage.setItem('SR_DATA', JSON.stringify(this.data))
+                window.localStorage.setItem('SR_USE', document.querySelector('#srUse').checked)
                 this.render()
             },
             save() {
@@ -216,7 +216,7 @@ permalink: /songs/edit/
                 this.data.srColor = this.picker['srColor'].getColor().toRGBA().toString()
                 this.data.srBgColor = this.picker['srBgColor'].getColor().toRGBA().toString()
 
-                localStorage.setItem('SR_DATA', JSON.stringify(this.data))
+                window.localStorage.setItem('SR_DATA', JSON.stringify(this.data))
                 this.render()
                 toast('저장되었습니다.')
             }
@@ -225,30 +225,30 @@ permalink: /songs/edit/
         const list = {
             data: [],
             get() {
-                this.data = JSON.parse(localStorage.getItem('SR_LIST')) || []
+                this.data = JSON.parse(window.localStorage.getItem('SR_LIST')) || []
                 this.render()
             },
             add() {
                 const { value } = document.querySelector('#srDirect')
                 if (value) {
                     this.data.push({ TITLE: value, IS_DONE: false })
-                    localStorage.setItem('SR_LIST', JSON.stringify(this.data))
+                    window.localStorage.setItem('SR_LIST', JSON.stringify(this.data))
                     this.render()
                     document.querySelector('#srDirect').value = ''
                 }
             },
             done(index) {
                 this.data[index].IS_DONE = true
-                localStorage.setItem('SR_LIST', JSON.stringify(this.data))
+                window.localStorage.setItem('SR_LIST', JSON.stringify(this.data))
                 this.render()
             },
             remove(index) {
                 this.data.splice(index, 1)
-                localStorage.setItem('SR_LIST', JSON.stringify(this.data))
+                window.localStorage.setItem('SR_LIST', JSON.stringify(this.data))
                 this.render()
             },
             clear() {
-                localStorage.removeItem('SR_LIST')
+                window.localStorage.removeItem('SR_LIST')
                 this.get()
             },
             render() {
