@@ -140,3 +140,22 @@
 $(document.links).filter(function () {
   return this.hostname != window.location.hostname;
 }).attr('target', '_blank');
+
+function toast(msg, delay = 3000) {
+  const el = document.createElement('div')
+  el.className = 'flex px-3 py-2 rounded bg-slate-600 text-white text-center justify-center text-lg'
+  el.style.width = '80%'
+  el.style.left = '10%'
+  el.style.right = '10%'
+  el.style.bottom = '1.5rem'
+  el.style.position = 'fixed'
+  el.style.transitionDuration = '1s'
+  el.innerHTML = `<div class="mx-5" style="width:90%;margin: 0 auto;white-space:pre-wrap;">${msg}</div>`
+  document.body.appendChild(el)
+  $(el).fadeIn()
+  setTimeout(() => {
+    $(el).fadeOut(500, 'swing', () => {
+      document.body.removeChild(el)
+    })
+  }, delay);
+}

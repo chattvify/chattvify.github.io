@@ -34,10 +34,10 @@ body {}
     background-color: #815fc0;
 }
 
-.chat-sample iframe{
+.chat-sample iframe {
     width: 100%;
     height: 500px;
-    background: rgba(0,0,0,0.35);
+    background: rgba(0, 0, 0, 0.35);
     border: none;
 }
 
@@ -47,16 +47,17 @@ body {}
 
 .border-chzzk,
 .border-chzzk:active {
-    border-color: #bae5d8!important;
+    border-color: #bae5d8 !important;
 }
 
 .border-chzzk:focus {
-    outline: #bae5d8!important;
+    outline: #bae5d8 !important;
 }
 
 .bg-chzzk {
     background-color: #bae5d8;
 }
+
 .bg-chzzk2 {
     background-color: #00ffa3;
 }

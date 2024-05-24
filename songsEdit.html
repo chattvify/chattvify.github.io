@@ -117,6 +117,13 @@ permalink: /songs/edit/
                 this.render()
             },
             save() {
+                this.data.TITLE = document.querySelector('#srTitle').value
+                this.data.CONTENT = document.querySelector('#srContent').value
+                this.data.TOON_KEY = document.querySelector('#srToonKey').value
+                this.data.TOON = document.querySelector('#srToon').value
+                this.data.IS_CHEESE = document.querySelector('#srUseCheese').checked
+                this.data.CHEESE = document.querySelector('#srChzzk').value
+                
                 localStorage.setItem('SR_DATA', JSON.stringify(this.data))
                 this.render()
             }

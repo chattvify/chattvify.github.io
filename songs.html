@@ -18,7 +18,8 @@ permalink: /songs/
     </div>
     <div>
         <label for="srContent" class="block text-sm font-medium leading-6 text-gray-900">내용</label>
-        <textarea id="about" name="about" rows="3" class="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"></textarea>
+        <textarea id="about" name="about" rows="3"
+            class="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"></textarea>
     </div>
 </div>
 {% endif %}
@@ -30,8 +31,32 @@ permalink: /songs/
         if (!isUuid) {
             location.search = `?${uuid}`
         }
-        const data = JSON.parse(localStorage.getItem('SR_DATA')) || {}
+        const config = JSON.parse(localStorage.getItem('SR_DATA')) || {}
 
+        const toon = {
+            payload: '',
+            get() {
+                $.ajax({
+                    url: `https://toon.at/widget/alertbox/${config.TOON_KEY}`,
+                    dataType: 'jsonp',
+                    jsonpCallback: 'parsePayload',
+                    success(data) {
+                        console.log('success', data)
+                    },
+                    error(xhr) {
+                        console.log(xhr)
+                    }
+                })
+                // console.log(res.body())
+            }
+        }
 
-    })   
+        toon.get()
+
+        window.toon = toon
+    })
+
+    function parsePayload(data) {
+        console.log('parse', data)
+    }
 </script>
