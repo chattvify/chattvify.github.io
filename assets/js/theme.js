@@ -58,21 +58,27 @@
     }
   }
 
-  document.querySelector('#chzzkSave').addEventListener('click', () => {
-    const name = document.querySelector('#chzzkName')
-    localStorage.setItem('CHZZK_KEY', name.value)
-    chatUrl()
-  })
+  if (document.querySelector('#chzzkSave')) {
+    document.querySelector('#chzzkSave').addEventListener('click', () => {
+      const name = document.querySelector('#chzzkName')
+      localStorage.setItem('CHZZK_KEY', name.value)
+      chatUrl()
+    })
+  }
 
-  document.querySelector('#queueOpen').addEventListener('click', () => {
-    const url = document.querySelector('#queueURL').value
-    window.open(url)
-  })
-  
-  document.querySelector('#queueSetting').addEventListener('click', () => {
-    const url = document.querySelector('#queueURL').value
-    window.open(`${url.replace('/songs/', '/songs/edit/')}`)
-  })
+  if (document.querySelector('#queueOpen')) {
+    document.querySelector('#queueOpen').addEventListener('click', () => {
+      const url = document.querySelector('#queueURL').value
+      window.open(url)
+    })
+  }
+
+  if (document.querySelector('#queueSetting')) {
+    document.querySelector('#queueSetting').addEventListener('click', () => {
+      const url = document.querySelector('#queueURL').value
+      window.open(`${url.replace('/songs/', '/songs/edit/')}`)
+    })
+  }
 
   document.querySelectorAll('[lv-btn-copy]').forEach((el) => {
     const handleBtn = () => {

@@ -103,7 +103,7 @@ permalink: /songs/edit/
                 this.render()
             },
             render() {
-                document.querySelector('#srUse').checekd = localStorage.getItem('SR_USE')
+                document.querySelector('#srUse').checekd = localStorage.getItem('SR_USE') || true
                 document.querySelector('#srTitle').value = this.data.TITLE
                 document.querySelector('#srContent').value = this.data.CONTENT
                 document.querySelector('#srToonKey').value = this.data.TOON_KEY
@@ -119,9 +119,6 @@ permalink: /songs/edit/
             save() {
                 localStorage.setItem('SR_DATA', JSON.stringify(this.data))
                 this.render()
-            },
-            cancel() {
-
             }
         }
 
@@ -174,6 +171,13 @@ permalink: /songs/edit/
         list.get()
 
         /* 이벤트 리스너 시작 */
+        document.querySelector('#btnSave').addEventListener('click', () => {
+            config.save()
+        })
+        document.querySelector('#btnCancel').addEventListener('click', () => {
+            config.get()
+        })
+
         document.querySelector('[lv-sr-list]').addEventListener('click', (e) => {
             const el = e.target
             const { nodeName } = el
