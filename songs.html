@@ -5,27 +5,21 @@ permalink: /songs/
 ---
 
 {% if page.url == "/songs/" %}
-<div class="flex flex-col m-2 px2-2 py-4 rounded-lg" lv-sr-box>
-    <b class="text-2xl text-center">테스트</h4>
+<div class="flex flex-col mx-4 my-2 px-3 py-4 rounded-lg sr-box shadow-xl">
+    <b id="srTitle" class="text-2xl text-center srColor"></b>
+    <div id="srContent" class="text-center srColor"></div>
+    <div id="srStatus" class="text-center srColor"></div>
+    <div class="w-full text-center mt-1">
+        <button type="button" id="srCurrent" class="w-auto px-3 py-1 rounded-full srColor"></button>
+    </div>
+    <div id="srList" class="flex flex-row flex-wrap whitespace-pre-wrap mt-2"></div>
 </div>
 {% endif %}
+<script type="module">
+    import { ChzzkChat } from "https://cdn.skypack.dev/chzzk"
 
-{% if page.url == "/songs/edit" %}
-<div class="flex flex-col m-2 px2-2 py-4 rounded-lg" lv-sr-box>
-    <div>
-        <label for="srTitle" class="block text-sm font-medium leading-6 text-gray-900">제목</label>
-        <input type="text" name="srTitle" class="block flex-1 border-0 bg-transparent py-1.5 pl-1 text-gray-900" />
-    </div>
-    <div>
-        <label for="srContent" class="block text-sm font-medium leading-6 text-gray-900">내용</label>
-        <textarea id="about" name="about" rows="3"
-            class="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"></textarea>
-    </div>
-</div>
-{% endif %}
-
-<script type="text/javascript">
     $(() => {
+        document.body.style.backgroundColor = '#00b140';
         const isUuid = !!location.search
         const uuid = isUuid ? location.search.substring(1) : crypto.randomUUID()
         if (!isUuid) {
@@ -36,6 +30,7 @@ permalink: /songs/
         const toon = {
             payload: '',
             socket: null,
+            timeout: false,
             async get() {
                 const url = `https://toon.at/widget/alertbox/${config.TOON_KEY}`
                 const res = await fetch(`https://corsproxy.io/?${encodeURIComponent(url)}`)
@@ -43,7 +38,7 @@ permalink: /songs/
 
                 this.payload = this.parse(html)
                 if (this.payload) {
-                    this.socket = new WebSocket(`wss://toon.at:8071/${this.payload}`)
+                    this.connect()
                 }
                 else {
                     toast('투네이션 페이로드를 찾을 수 없습니다.')
@@ -53,6 +48,56 @@ permalink: /songs/
                 // iframe.src = `https://toon.at/widget/alertbox/${config.TOON_KEY}`
                 // document.body.append(iframe)
                 // console.log(res.body())
+            },
+            connect() {
+                this.socket = new WebSocket(`wss://ws.toon.at/${this.payload}`)
+
+                this.socket.onopen = (msg) => {
+                    if (!this.timeout) {
+                        toast('투네이션에 연결되었습니다.', 1000)
+                    }
+                    else {
+                        this.timeout = false
+                    }
+                    if (!this.invl) {
+                        this.invl = setInterval(() => {
+                            if (this.socket.readyState == 1) {
+                                this.socket.send('#ping')
+                            }
+                        }, 10000)
+                    }
+                }
+
+                this.socket.onmessage = ({ data }) => {
+                    if (data != '#pong') {
+                        const { test, content } = JSON.parse(data)
+                        // if(!test){
+                        if (content) {
+                            // console.log(content)
+                            if (content.amount == parseInt(config.TOON)) {
+                                add(content.message)
+                            }
+                        }
+                        // }
+                    }
+                }
+
+                this.socket.onerror = (data) => {
+                    this.timeout = true
+                    this.close(1000)
+
+                    this.connect()
+                }
+
+                this.socket.onclose = (data) => {
+                    if (!data.wasClean) {
+                        console.log('커넥션 유실. 재연결...')
+                        this.connect()
+                    }
+                    console.log('투네이션 연결이 종료되었습니다.')
+                }
+
+                this.socket.onfail
             },
             parse(data) {
                 const regex = /"payload":"(.*)",/
@@ -64,8 +109,90 @@ permalink: /songs/
             },
         }
 
+        const chzzk = {
+            socket: null,
+            data: '',
+            async get() {
+                this.data = JSON.parse(atob(uuid))
+                const client = await new ChzzkChat({
+                    chatChannelId: this.data.id,
+                    baseUrls: {
+                        chzzkBaseUrl: "https://api.chzzk.naver.com",
+                        gameBaseUrl: "https://comm-api.game.naver.com/nng_main"
+                    }
+                })
+                const chzzkChat = await client.client.chat({
+                    channelId: this.data.id,
+                    pollInterval: 30 * 1000
+                })
+                console.log(chzzkChat)
+                // const url = `https://api.chzzk.naver.com/polling/v2/channels/${this.data.id}/live-status`
+                // const res = await fetch(url, {
+                //     headers: {
+                //         "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36 Edg/122.0.0.0"
+                //     },
+                // })
+                // console.log(res)
+            },
+            connect() {
+                this.socket = new WebSocket('wss://kr-ss3.chat.naver.com/chat')
+            }
+        }
+
         if (config.TOON_KEY) {
             toon.get()
         }
+
+        if (config.IS_CHEESE) {
+            chzzk.get()
+            window.chzzk = chzzk
+        }
+
+        const add = (msg) => {
+            const list = JSON.parse(localStorage.getItem('SR_LIST'))
+            list.push({ TITLE: msg, IS_DONE: false })
+            localStorage.setItem('SR_LIST', JSON.stringify(list))
+        }
+
+        const render = (type) => {
+            if (!type || type == 'config') {
+                document.querySelector('#srTitle').innerHTML = config.TITLE || ''
+                document.querySelector('#srContent').innerHTML = config.CONTENT || ''
+                document.querySelector('.sr-box').style.backgroundColor = config.srBgColor || 'rgba(255, 255, 255, 0.7)'
+                document.querySelectorAll('.srColor:not(button)').forEach((el) => {
+                    el.style.color = config.srColor || '#000000'
+                })
+                document.querySelector('button.srColor').style.backgroundColor = config.srColor || '#000000'
+                document.querySelector('button.srColor').style.color = '#ffffff'
+                document.querySelector('#srList').style.color = config.srColor || '#000000'
+            }
+            if (!type || type == 'list') {
+                const isUse = localStorage.getItem('SR_USE') == undefined ? true : localStorage.getItem('SR_USE') == 'true'
+                const data = JSON.parse(localStorage.getItem('SR_LIST'))
+                const done = data.filter((r) => r.IS_DONE)
+                const left = data.filter((r) => !r.IS_DONE)
+
+                document.querySelector('#srStatus').innerHTML = `[신청${isUse ? '중' : '완료'}] ( ${done.length} / ${data.length} )`
+                document.querySelector('#srCurrent').innerHTML = left.length ? left[0].TITLE : '없음'
+                document.querySelector('#srList').innerHTML = `<s>${done.map((r) => {
+                    return `<span>${r.TITLE}</span>`
+                }).join('/')}${done.length ? '/' : ''}</s>${left.map((r) => {
+                    return `<span>${r.TITLE}</span>`
+                }).join('/')}`
+            }
+        }
+        render()
+
+        setInterval(() => {
+            const data = JSON.parse(localStorage.getItem('SR_DATA'))
+            if (data.CID != config.CID) {
+                Object.keys(data).forEach((k) => {
+                    config[k] = data[k]
+                })
+                console.log('config update...')
+                render('config')
+            }
+            render('list')
+        }, 1000);
     })
 </script>

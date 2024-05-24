@@ -5,6 +5,11 @@ permalink: /songs/edit/
 ---
 
 {% if page.url == "/songs/edit/" %}
+<style>
+    .pickr { 
+        display: inline-block;
+    }
+</style>
 <div class="flex flex-col m-2 px2-2 py-4 rounded-lg gap-y-2" lv-sr-box>
     <div>
         <label for="srTitle" class="block text-sm font-medium leading-6 text-gray-900">제목</label>
@@ -14,7 +19,16 @@ permalink: /songs/edit/
     <div>
         <label for="srContent" class="block text-sm font-medium leading-6 text-gray-900">내용</label>
         <textarea id="srContent" name="srContent" rows="3"
-            class="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"></textarea>
+            class="block w-full rounded-md border-0 px-1 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"></textarea>
+    </div>
+    <div class="border-2 bg-indigo-50 rounded p-2">
+        <label class="block text-sm font-medium leading-6 text-gray-900">색상 설정</label>
+        <label for="srColor" class="text-sm font-medium leading-6 text-gray-900">기본색(제목, 버튼색)</label>
+        <input type="text" name="srColor"
+            class="rounded border-0 bg-transparent py-1.5 pl-1 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6">
+        <label for="srBgColor" class="text-sm font-medium leading-6 text-gray-900">배경색</label>
+        <input type="text" name="srBgColor"
+            class="rounded border-0 bg-transparent py-1.5 pl-1 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6">
     </div>
     <div class="border-2 bg-blue-50 rounded p-2">
         <label for="srToonKey" class="block text-sm font-medium leading-6 text-gray-900">투네이션 설정</label>
@@ -91,6 +105,77 @@ permalink: /songs/edit/
 
         const config = {
             data: {},
+            picker: {},
+            initPicker() {
+                ['srColor', 'srBgColor'].forEach(r => {
+                    if (!this.picker.hasOwnProperty(r)) {
+                        this.picker[r] = Pickr.create({
+                            el: document.querySelector(`[name=${r}]`),
+                            container: 'body',
+                            theme: 'nano',
+                            default: this.data[r] || 'rgb(0, 0, 0)',
+                            swatches: [
+                                'rgba(244, 67, 54, 1)',
+                                'rgba(233, 30, 99, 1)',
+                                'rgba(156, 39, 176, 1)',
+                                'rgba(103, 58, 183, 1)',
+                                'rgba(63, 81, 181, 1)',
+                                'rgba(33, 150, 243, 1)',
+                                'rgba(3, 169, 244, 1)',
+                                'rgba(0, 188, 212, 1)',
+                                'rgba(0, 150, 136, 1)',
+                                'rgba(76, 175, 80, 1)',
+                                'rgba(139, 195, 74, 1)',
+                                'rgba(205, 220, 57, 1)',
+                                'rgba(255, 235, 59, 1)',
+                                'rgba(255, 193, 7, 1)'
+                            ],
+                            components: {
+                                palette: true,
+                                preview: true,
+                                opacity: true,
+                                hue: true,
+                                interaction: {
+                                    input: true,
+                                    cancel: true,
+                                    save: true
+                                }
+                            },
+                            interaction: {
+                                rgba: true
+                            },
+                            i18n: {
+                                // Strings visible in the UI
+                                'ui:dialog': 'color picker dialog',
+                                'btn:toggle': 'toggle color picker dialog',
+                                'btn:swatch': 'color swatch',
+                                'btn:last-color': 'use previous color',
+                                'btn:save': 'Save',
+                                'btn:cancel': 'Cancel',
+                                'btn:clear': 'Clear',
+
+                                // Strings used for aria-labels
+                                'aria:btn:save': 'save and close',
+                                'aria:btn:cancel': 'cancel and close',
+                                'aria:btn:clear': 'clear and close',
+                                'aria:input': 'color input field',
+                                'aria:palette': 'color selection area',
+                                'aria:hue': 'hue selection slider',
+                                'aria:opacity': 'selection slider'
+                            }
+                        }).on('init', (color, instance) => {
+                            document.querySelectorAll('.pcr-save').forEach((el) => { el.value = 'Save' })
+                            document.querySelectorAll('.pcr-cancel').forEach((el) => { el.value = 'Cancel' })
+                        }).on('save', (color, instance) => {
+                            if (color) {
+                                this.picker[r].hide()
+                            }
+                        }).on('cancel', instance => {
+                            this.picker[r].hide()
+                        })
+                    }
+                });
+            },
             get() {
                 this.data = JSON.parse(localStorage.getItem('SR_DATA')) || {
                     IS_CHEESE: false,
@@ -99,11 +184,14 @@ permalink: /songs/edit/
                     TOON_KEY: '',
                     TOON: 1000,
                     CHEESE: 1000,
+                    srBgColor: 'rgba(255, 255, 255, 0.7)',
+                    srColor: 'rgb(0, 0, 0)'
                 }
                 this.render()
             },
             render() {
-                document.querySelector('#srUse').checekd = localStorage.getItem('SR_USE') || true
+                this.initPicker()
+                document.querySelector('#srUse').checked = localStorage.getItem('SR_USE') == undefined ? true : localStorage.getItem('SR_USE') == 'true'
                 document.querySelector('#srTitle').value = this.data.TITLE
                 document.querySelector('#srContent').value = this.data.CONTENT
                 document.querySelector('#srToonKey').value = this.data.TOON_KEY
@@ -112,20 +200,25 @@ permalink: /songs/edit/
                 document.querySelector('#srChzzk').value = this.data.CHEESE
             },
             toggle() {
-                this.data.IS_USE = document.querySelector('#srUseCheese').checked
-                localStorage.setItem('SR_USE', JSON.stringify(this.data))
+                this.data.CID = new Date().getTime()
+                localStorage.setItem('SR_DATA', JSON.stringify(this.data))
+                localStorage.setItem('SR_USE', document.querySelector('#srUse').checked)
                 this.render()
             },
             save() {
+                this.data.CID = new Date().getTime()
                 this.data.TITLE = document.querySelector('#srTitle').value
                 this.data.CONTENT = document.querySelector('#srContent').value
                 this.data.TOON_KEY = document.querySelector('#srToonKey').value
                 this.data.TOON = document.querySelector('#srToon').value
                 this.data.IS_CHEESE = document.querySelector('#srUseCheese').checked
                 this.data.CHEESE = document.querySelector('#srChzzk').value
-                
+                this.data.srColor = this.picker['srColor'].getColor().toRGBA().toString()
+                this.data.srBgColor = this.picker['srBgColor'].getColor().toRGBA().toString()
+
                 localStorage.setItem('SR_DATA', JSON.stringify(this.data))
                 this.render()
+                toast('저장되었습니다.')
             }
         }
 
@@ -138,11 +231,16 @@ permalink: /songs/edit/
             add() {
                 const { value } = document.querySelector('#srDirect')
                 if (value) {
-                    this.data.push({ TITLE: value, IS_DISABLED: false })
+                    this.data.push({ TITLE: value, IS_DONE: false })
                     localStorage.setItem('SR_LIST', JSON.stringify(this.data))
                     this.render()
                     document.querySelector('#srDirect').value = ''
                 }
+            },
+            done(index) {
+                this.data[index].IS_DONE = true
+                localStorage.setItem('SR_LIST', JSON.stringify(this.data))
+                this.render()
             },
             remove(index) {
                 this.data.splice(index, 1)
@@ -162,7 +260,7 @@ permalink: /songs/edit/
                     elItem.className = 'flex justify-between gap-x-6 py-3'
                     elItem.innerHTML = `<div class="flex min-w-0 gap-x-4">
                         <div class="min-w-0 flex-auto">
-                            <p class="text-base font-semibold leading-6 text-gray-900">${r.TITLE}</p>
+                            <p class="text-base font-semibold leading-6 text-gray-900${r.IS_DONE ? ' line-through' : ''}">${r.TITLE}</p>
                         </div>
                         <div class="flex-3">
                             <button type="button" class="btn btn-sm btn-outline-success" lv-sr-submit=${index}>완료</button>
@@ -185,17 +283,22 @@ permalink: /songs/edit/
             config.get()
         })
 
+        document.querySelector('#srUse').addEventListener('change', (e) => {
+            console.log(e.target.checked, document.querySelector('#srUse').checked)
+            config.toggle()
+        })
+
         document.querySelector('[lv-sr-list]').addEventListener('click', (e) => {
             const el = e.target
             const { nodeName } = el
             if (nodeName == 'BUTTON') {
                 if (el.hasAttribute('lv-sr-submit')) {
                     const index = el.getAttribute('lv-sr-submit')
-                    console.log('완료', index)
+                    list.done(index)
                 }
                 else if (el.hasAttribute('lv-sr-remove')) {
                     const index = el.getAttribute('lv-sr-remove')
-                    console.log('삭제', index)
+                    list.remove(index)
                 }
             }
         })
