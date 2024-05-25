@@ -6,7 +6,7 @@ permalink: /songs/edit/
 
 {% if page.url == "/songs/edit/" %}
 <style>
-    .pickr { 
+    .pickr {
         display: inline-block;
     }
 </style>
@@ -44,6 +44,7 @@ permalink: /songs/edit/
         <input type="number" name="srToon" id="srToon"
             class="block flex-1 w-full border-0 bg-transparent py-1.5 pl-1 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6" />
     </div>
+    <!-- 
     <div class="border-2 bg-yellow-50 rounded p-2">
         <div class="flex">
             <label class="text-sm font-medium leading-6 text-gray-900">치즈 설정</label>
@@ -59,6 +60,7 @@ permalink: /songs/edit/
         <input type="number" name="srChzzk" id="srChzzk"
             class="block flex-1 w-full border-0 bg-transparent py-1.5 pl-1 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6" />
     </div>
+    -->
 
     <div class="flex mt-2 gap-x-2">
         <button type="button" id="btnSave"
@@ -94,13 +96,30 @@ permalink: /songs/edit/
 </div>
 {% endif %}
 
-<script type="text/javascript">
+<script type="module">
+    import { io } from "https://cdn.socket.io/4.7.5/socket.io.esm.min.js";
+
     $(() => {
         const isUuid = !!location.search
         const uuid = isUuid ? location.search.substring(1) : crypto.randomUUID()
         if (!isUuid) {
             location.search = `?${uuid}`
         }
+
+        const socket = io('http://starboard.iptime.org:3000', {
+            path: '/socket.io'
+        });
+
+        socket.on('connect', () => {
+            
+        });
+
+        socket.on('refresh', (data) => {
+            console.log(data)
+            if (data.uuid == uuid) {
+                config.get()
+            }
+        })
 
 
         const config = {
@@ -176,8 +195,18 @@ permalink: /songs/edit/
                     }
                 });
             },
-            get() {
-                this.data = JSON.parse(window.localStorage.getItem('SR_DATA')) || {
+            async get() {
+                const res = await fetch(`https://loa-on.snorlaxh.workers.dev/sr/${uuid}`, {
+                    method: 'GET',
+                    headers: {
+                        "Access-Control-Allow-Headers": "*",
+                        "Access-Control-Allow-Methods": "GET",
+                        "Access-Control-Allow-Origin": "*"
+                    }
+                });
+                const data = await res.json();
+                this.data = data.config || {
+                    IS_USE: true,
                     IS_CHEESE: false,
                     TITLE: '',
                     CONTENT: '',
@@ -187,11 +216,44 @@ permalink: /songs/edit/
                     srBgColor: 'rgba(255, 255, 255, 0.7)',
                     srColor: 'rgb(0, 0, 0)'
                 }
+                list.data = data.list
+
                 this.render()
+                list.render()
+            },
+            async set(type) {
+                if (!type) {
+                    toast('type값이 없음')
+                }
+                const body = {}
+                if (type == 'config') {
+                    body[type] = this.data
+                }
+                else if (type == 'list') {
+                    body[type] = list.data
+                }
+                const res = await fetch(`https://loa-on.snorlaxh.workers.dev/sr/${uuid}`, {
+                    method: 'POST',
+                    body: JSON.stringify(body),
+                    headers: {
+                        "Access-Control-Allow-Headers": "*",
+                        "Access-Control-Allow-Methods": "POST",
+                        "Access-Control-Allow-Origin": "*"
+                    }
+                })
+                socket.emit('save', {
+                    uuid,
+                    type
+                })
+
+                if (type == 'config') {
+                    toast('저장되었습니다.')
+                }
+                this.get()
             },
             render() {
                 this.initPicker()
-                document.querySelector('#srUse').checked = window.localStorage.getItem('SR_USE') == undefined ? true : window.localStorage.getItem('SR_USE') == 'true'
+                document.querySelector('#srUse').checked = this.data.IS_USE
                 document.querySelector('#srTitle').value = this.data.TITLE
                 document.querySelector('#srContent').value = this.data.CONTENT
                 document.querySelector('#srToonKey').value = this.data.TOON_KEY
@@ -199,14 +261,9 @@ permalink: /songs/edit/
                 document.querySelector('#srUseCheese').checked = this.data.IS_CHEESE
                 document.querySelector('#srChzzk').value = this.data.CHEESE
             },
-            toggle() {
-                this.data.CID = new Date().getTime()
-                window.localStorage.setItem('SR_DATA', JSON.stringify(this.data))
-                window.localStorage.setItem('SR_USE', document.querySelector('#srUse').checked)
-                this.render()
-            },
             save() {
                 this.data.CID = new Date().getTime()
+                this.data.IS_USE = document.querySelector('#srUse').checked
                 this.data.TITLE = document.querySelector('#srTitle').value
                 this.data.CONTENT = document.querySelector('#srContent').value
                 this.data.TOON_KEY = document.querySelector('#srToonKey').value
@@ -216,40 +273,37 @@ permalink: /songs/edit/
                 this.data.srColor = this.picker['srColor'].getColor().toRGBA().toString()
                 this.data.srBgColor = this.picker['srBgColor'].getColor().toRGBA().toString()
 
-                window.localStorage.setItem('SR_DATA', JSON.stringify(this.data))
-                this.render()
-                toast('저장되었습니다.')
+                // window.localStorage.setItem('SR_DATA', JSON.stringify(this.data))
+                this.set('config')
             }
         }
 
         const list = {
             data: [],
-            get() {
-                this.data = JSON.parse(window.localStorage.getItem('SR_LIST')) || []
-                this.render()
-            },
-            add() {
+            async add() {
                 const { value } = document.querySelector('#srDirect')
                 if (value) {
                     this.data.push({ TITLE: value, IS_DONE: false })
-                    window.localStorage.setItem('SR_LIST', JSON.stringify(this.data))
+                    await config.set('list')
                     this.render()
                     document.querySelector('#srDirect').value = ''
                 }
             },
             done(index) {
                 this.data[index].IS_DONE = true
-                window.localStorage.setItem('SR_LIST', JSON.stringify(this.data))
-                this.render()
+                config.set('list')
             },
             remove(index) {
                 this.data.splice(index, 1)
-                window.localStorage.setItem('SR_LIST', JSON.stringify(this.data))
-                this.render()
+                config.set('list')
+            },
+            rollback(index) {
+                this.data[index].IS_DONE = false
+                config.set('list')
             },
             clear() {
-                window.localStorage.removeItem('SR_LIST')
-                this.get()
+                this.data.splice(0, this.data.length)
+                config.set('list')
             },
             render() {
                 const srList = document.querySelector('[lv-sr-list]')
@@ -263,7 +317,7 @@ permalink: /songs/edit/
                             <p class="text-base font-semibold leading-6 text-gray-900${r.IS_DONE ? ' line-through' : ''}">${r.TITLE}</p>
                         </div>
                         <div class="flex-3">
-                            <button type="button" class="btn btn-sm btn-outline-success" lv-sr-submit=${index}>완료</button>
+                            ${r.IS_DONE ? '<button type="button" class="btn btn-sm btn-outline-success" lv-sr-rollback=${index}>완료</button>' : `<button type="button" class="btn btn-sm btn-outline-success" lv-sr-submit=${index}>완료</button>`}
                             <button type="button" class="btn btn-sm btn-outline-danger" lv-sr-remove=${index}>삭제</button>
                         </div>
                     </div>`;
@@ -273,11 +327,11 @@ permalink: /songs/edit/
         }
 
         config.get()
-        list.get()
 
         /* 이벤트 리스너 시작 */
         document.querySelector('#btnSave').addEventListener('click', () => {
             config.save()
+            // location.replace(location.href.replace('/songs/edit/', '/songs/'))
         })
         document.querySelector('#btnCancel').addEventListener('click', () => {
             config.get()
@@ -285,7 +339,7 @@ permalink: /songs/edit/
 
         document.querySelector('#srUse').addEventListener('change', (e) => {
             console.log(e.target.checked, document.querySelector('#srUse').checked)
-            config.toggle()
+            config.save()
         })
 
         document.querySelector('[lv-sr-list]').addEventListener('click', (e) => {
@@ -299,6 +353,10 @@ permalink: /songs/edit/
                 else if (el.hasAttribute('lv-sr-remove')) {
                     const index = el.getAttribute('lv-sr-remove')
                     list.remove(index)
+                }
+                else if (el.hasAttribute('lv-sr-rollback')) {
+                    const index = el.getAttribute('lv-sr-rollback')
+                    list.rollback(index)
                 }
             }
         })

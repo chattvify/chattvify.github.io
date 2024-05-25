@@ -14,10 +14,11 @@ permalink: /songs/
     </div>
     <div id="srList" class="flex flex-row flex-wrap whitespace-pre-wrap mt-2"></div>
 </div>
+
 {% endif %}
 <script type="module">
     import { ChzzkChat } from "https://cdn.skypack.dev/chzzk"
-
+    import { io } from "https://cdn.socket.io/4.7.5/socket.io.esm.min.js";
     $(() => {
         document.body.style.backgroundColor = '#00b140';
         const isUuid = !!location.search
@@ -25,17 +26,68 @@ permalink: /songs/
         if (!isUuid) {
             location.search = `?${uuid}`
         }
-        const config = JSON.parse(window.localStorage.getItem('SR_DATA')) || {}
-        if(!window.localStorage.getItem('SR_LIST')) {
-            window.localStorage.setItem('SR_LIST', JSON.stringify([]))
+
+        const config = {
+            data: {},
+            list: [],
+            async init() {
+                await this.get()
+                if (config.data.TOON_KEY) {
+                    toon.get()
+                }
+
+                if (config.data.IS_CHEESE) {
+                    chzzk.get()
+                    window.chzzk = chzzk
+                }
+            },
+            async get(type) {
+                const res = await fetch(`https://loa-on.snorlaxh.workers.dev/sr/${uuid}`, {
+                    method: 'GET',
+                    headers: {
+                        "Access-Control-Allow-Headers": "*",
+                        "Access-Control-Allow-Methods": "GET",
+                        "Access-Control-Allow-Origin": "*"
+                    }
+                });
+                const data = await res.json();
+                if (!type || type == 'config') {
+                    this.data = {
+                        ...data.config || {}
+                    };
+                }
+                if (!type || type == 'list') {
+                    this.list = data.list || [];
+                }
+
+                render(type)
+            }
         }
+
+        const socket = io('http://starboard.iptime.org:3000', {
+            path: '/socket.io'
+        });
+
+        socket.on('connect', () => {
+            console.log('server connected');
+
+            socket.interval = setInterval(() => {
+                socket.emit('#ping')
+            }, 10000);
+        });
+
+        socket.on('refresh', (data) => {
+            if (data.uuid == uuid) {
+                config.get(data.type)
+            }
+        })
 
         const toon = {
             payload: '',
             socket: null,
             timeout: false,
             async get() {
-                const url = `https://toon.at/widget/alertbox/${config.TOON_KEY}`
+                const url = `https://toon.at/widget/alertbox/${config.data.TOON_KEY}`
                 const res = await fetch(`https://corsproxy.io/?${encodeURIComponent(url)}`)
                 const html = await res.text()
 
@@ -48,7 +100,7 @@ permalink: /songs/
                 }
                 // const iframe = document.createElement('iframe')
                 // iframe.id = 'toon'
-                // iframe.src = `https://toon.at/widget/alertbox/${config.TOON_KEY}`
+                // iframe.src = `https://toon.at/widget/alertbox/${config.data.TOON_KEY}`
                 // document.body.append(iframe)
                 // console.log(res.body())
             },
@@ -77,7 +129,7 @@ permalink: /songs/
                         // if(!test){
                         if (content) {
                             // console.log(content)
-                            if (content.amount == parseInt(config.TOON)) {
+                            if (content.amount == parseInt(config.data.TOON)) {
                                 add(content.message)
                             }
                         }
@@ -142,40 +194,58 @@ permalink: /songs/
             }
         }
 
-        if (config.TOON_KEY) {
-            toon.get()
-        }
+        config.init()
 
-        if (config.IS_CHEESE) {
-            chzzk.get()
-            window.chzzk = chzzk
-        }
-
-        const add = (msg) => {
-            const list = JSON.parse(window.localStorage.getItem('SR_LIST'))
+        const add = async (msg) => {
+            const res = await fetch(`https://loa-on.snorlaxh.workers.dev/sr/${uuid}`, {
+                method: 'GET',
+                headers: {
+                    "Access-Control-Allow-Headers": "*",
+                    "Access-Control-Allow-Methods": "GET",
+                    "Access-Control-Allow-Origin": "*"
+                }
+            });
+            const data = await res.json();
+            const list = data.list
             list.push({ TITLE: msg, IS_DONE: false })
-            window.localStorage.setItem('SR_LIST', JSON.stringify(list))
+
+            await fetch(`https://loa-on.snorlaxh.workers.dev/sr/${uuid}`, {
+                method: 'POST',
+                body: JSON.stringify({
+                    list,
+                }),
+                headers: {
+                    "Access-Control-Allow-Headers": "*",
+                    "Access-Control-Allow-Methods": "POST",
+                    "Access-Control-Allow-Origin": "*"
+                }
+            })
+            config.get('list')
+            socket.emit('save', {
+                uuid,
+                type: 'list'
+            })
         }
 
         const render = (type) => {
             if (!type || type == 'config') {
-                document.querySelector('#srTitle').innerHTML = config.TITLE || ''
-                document.querySelector('#srContent').innerHTML = config.CONTENT || ''
-                document.querySelector('.sr-box').style.backgroundColor = config.srBgColor || 'rgba(255, 255, 255, 0.7)'
+                document.querySelector('#srTitle').innerHTML = config.data.TITLE || ''
+                document.querySelector('#srContent').innerHTML = config.data.CONTENT || ''
+                document.querySelector('.sr-box').style.backgroundColor = config.data.srBgColor || 'rgba(255, 255, 255, 0.7)'
                 document.querySelectorAll('.srColor:not(button)').forEach((el) => {
-                    el.style.color = config.srColor || '#000000'
+                    el.style.color = config.data.srColor || '#000000'
                 })
-                document.querySelector('button.srColor').style.backgroundColor = config.srColor || '#000000'
+                document.querySelector('button.srColor').style.backgroundColor = config.data.srColor || '#000000'
                 document.querySelector('button.srColor').style.color = '#ffffff'
-                document.querySelector('#srList').style.color = config.srColor || '#000000'
+                document.querySelector('#srList').style.color = config.data.srColor || '#000000'
             }
             if (!type || type == 'list') {
-                const isUse = window.localStorage.getItem('SR_USE') == undefined ? true : window.localStorage.getItem('SR_USE') == 'true'
-                const data = JSON.parse(window.localStorage.getItem('SR_LIST'))
-                const done = data.filter((r) => r.IS_DONE)
-                const left = data.filter((r) => !r.IS_DONE)
+                const isUse = config.data.IS_USE
+                const done = config.list.filter((r) => r.IS_DONE)
+                const left = config.list.filter((r) => !r.IS_DONE)
+                console.log(config.list)
 
-                document.querySelector('#srStatus').innerHTML = `[신청${isUse ? '중' : '완료'}] ( ${done.length} / ${data.length} )`
+                document.querySelector('#srStatus').innerHTML = `[신청${isUse ? '중' : '완료'}] ( ${done.length} / ${config.list.length} )`
                 document.querySelector('#srCurrent').innerHTML = left.length ? left[0].TITLE : '없음'
                 document.querySelector('#srList').innerHTML = `<s>${done.map((r) => {
                     return `<span>${r.TITLE}</span>`
@@ -184,18 +254,5 @@ permalink: /songs/
                 }).join('/')}`
             }
         }
-        render()
-
-        setInterval(() => {
-            const data = JSON.parse(window.localStorage.getItem('SR_DATA'))
-            if (data.CID != config.CID) {
-                Object.keys(data).forEach((k) => {
-                    config[k] = data[k]
-                })
-                console.log('config update...')
-                render('config')
-            }
-            render('list')
-        }, 1000);
     })
 </script>
