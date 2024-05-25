@@ -12,6 +12,10 @@ permalink: /songs/edit/
 </style>
 <div class="flex flex-col m-2 px2-2 py-4 rounded-lg gap-y-2" lv-sr-box>
     <div>
+        <label class="text-sm font-medium leading-6 text-gray-900">연결 상태</label>
+        <span id="srStatus" class="text-lg">●</span>
+    </div>
+    <div>
         <label for="srTitle" class="block text-sm font-medium leading-6 text-gray-900">제목</label>
         <input type="text" name="srTitle" id="srTitle"
             class="block flex-1 w-full border-0 bg-transparent py-1.5 pl-1 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6" />
@@ -111,8 +115,14 @@ permalink: /songs/edit/
         });
 
         socket.on('connect', () => {
-            
+            document.querySelector('#srStatus').classList.remove('text-neutral-500')
+            document.querySelector('#srStatus').classList.add('text-green-500')
         });
+
+        socket.on('disconnect', () => {
+            document.querySelector('#srStatus').classList.remove('text-green-500')
+            document.querySelector('#srStatus').classList.add('text-neutral-500')
+        })
 
         socket.on('refresh', (data) => {
             console.log(data)
